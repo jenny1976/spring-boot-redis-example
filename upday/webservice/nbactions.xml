@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-boot</actionName>
+            <displayName>boot</displayName>
+            <goals>
+                <goal>mvn</goal>
+                <goal>package</goal>
+                <goal>&amp;&amp;</goal>
+                <goal>java</goal>
+                <goal>-jar</goal>
+                <goal>target/gs-spring-boot-0.1.0.jar</goal>
+            </goals>
+        </action>
+    </actions>
