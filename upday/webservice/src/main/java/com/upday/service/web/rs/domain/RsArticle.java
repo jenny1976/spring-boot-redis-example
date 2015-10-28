@@ -13,7 +13,6 @@ public class RsArticle implements Serializable {
     
     private static final long serialVersionUID = -4150137843471878449L;
     
-    
     private Long id;
     private String header;
     private String shortDescription;
