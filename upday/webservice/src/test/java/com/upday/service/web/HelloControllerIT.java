@@ -1,5 +1,6 @@
 package com.upday.service.web;
 
+import com.upday.service.Application;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
