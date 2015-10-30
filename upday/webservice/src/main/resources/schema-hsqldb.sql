@@ -3,9 +3,10 @@ create table NEWS_ARTICLE
     id INTEGER NOT NULL,
     headline VARCHAR(300),
     description VARCHAR(500),
-    maintext VARCHAR(1000),
+    maintext VARCHAR(3000),
     publishedOn DATE,
     createdOn DATE NOT NULL,
+    updatedOn DATE NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -15,6 +16,7 @@ create table NEWS_AUTHOR
     firstname VARCHAR(300),
     lastname VARCHAR(300),
     createdOn DATE NOT NULL,
+    updatedOn DATE NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -24,6 +26,7 @@ create table NEWS_KEYWORD
     name VARCHAR(300),
     description VARCHAR(300),
     createdOn DATE NOT NULL,
+    updatedOn DATE NOT NULL,
     PRIMARY KEY (id)
 );
 
