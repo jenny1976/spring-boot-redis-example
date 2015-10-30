@@ -1,9 +1,12 @@
 package com.upday.service.web;
 
-import com.upday.service.persistence.api.MemoryService;
+import com.upday.service.persistence.api.ArticleRepository;
+import com.upday.service.persistence.domain.Article;
 import com.upday.service.web.rs.domain.RsArticle;
-import java.sql.Date;
+import com.upday.service.web.rs.domain.RsAuthor;
+import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,63 +21,83 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author jschulz
  */
 @RestController
-@RequestMapping(value = "/article")
+@RequestMapping(value = "/articles")
 public class ServiceController {
-
+    
     @Autowired
-    private MemoryService memoryService;
+    private ArticleRepository articleRepository;
 
     @RequestMapping(
-            value = "/create",
+            value = "/",
             method = RequestMethod.PUT
     )
-    public @ResponseBody
-    RsArticle createArticle(@RequestBody RsArticle rsArticle) {
+    public @ResponseBody RsArticle createArticle(@RequestBody RsArticle rsArticle) {
 
         RsArticle article = new RsArticle();
         article.setId(0L);
-        article.setHeader("test headline");
+        article.setHeadline("test headline");
         article.setMainText("test maintext");
-        article.setPublishedOn(Date.valueOf("2012-23-01"));
         article.setShortDescription("test description");
+        article.setPublishedOn(new DateTime().toDate());
+        
+        articleRepository.save(new Article());
+        
         return article;
     }
 
     @RequestMapping(
-            value = "/update/{articleId}",
+            value = "/{articleId}",
             method = RequestMethod.POST
     )
-    public @ResponseBody
-    RsArticle updateArticle(@PathVariable("articleId") Long articleId) {
+    public @ResponseBody RsArticle updateArticle(@PathVariable("articleId") Long articleId) {
 
         RsArticle article = new RsArticle();
         article.setId(articleId);
-        article.setHeader("test headline");
+        article.setHeadline("test headline");
         article.setMainText("test maintext");
-//        article.setPublishedOn(new java.util.Date("2012-23-01"));
         article.setShortDescription("test description");
+        article.setPublishedOn(new DateTime().toDate());
+        
+        RsAuthor author = new RsAuthor(1L, "Test", "Author1");
+        RsAuthor author2 = new RsAuthor(2L, "Test", "Author2");
+        RsAuthor author3 = new RsAuthor(3L, "Test", "Author3");
+        List<RsAuthor> authors = new ArrayList<>(3);
+        authors.add(author);
+        authors.add(author2);
+        authors.add(author3);
+        
+        article.setAuthors(authors);
         return article;
     }
 
     @RequestMapping(
-            value = "/delete/{articleId}",
+            value = "/{articleId}",
             method = RequestMethod.DELETE
     )
     public void deleteArticle(@PathVariable("articleId") Long articleId) {
         //
     }
+    
+    @RequestMapping(
+            value = "/{articleId}",
+            method = RequestMethod.GET
+    )
+    public RsArticle getArticle(@PathVariable("articleId") Long articleId) {
+        final Article dbArticle = articleRepository.findOne(articleId);
+        
+        return convert(dbArticle);
+    }
 
     /**
      *
-     * @param author
+     * @param authorId
      * @return
      */
     @RequestMapping(
-            value = "/author/{author}",
+            value = "/author/{authorId}",
             method = RequestMethod.GET
     )
-    public @ResponseBody
-    List<RsArticle> findArticleByAuthor(@PathVariable("author") String author) {
+    public @ResponseBody List<RsArticle> getArticleByAuthor(@PathVariable("authorId") Long authorId) {
 
         return null;
     }
@@ -83,8 +106,7 @@ public class ServiceController {
             value = "/date/{from}/{to}",
             method = RequestMethod.GET
     )
-    public @ResponseBody
-    List<RsArticle> findArticleByDate(@PathVariable("from") String from,
+    public @ResponseBody List<RsArticle> getArticleByDateRange(@PathVariable("from") String from,
             @PathVariable("to") String to) {
         return null;
     }
@@ -93,10 +115,19 @@ public class ServiceController {
             value = "/search/{searchKeyword}",
             method = RequestMethod.GET
     )
-    public @ResponseBody
-    List<RsArticle> findArticleByKeyword(
+    public @ResponseBody List<RsArticle> getArticleByKeyword(
             @PathVariable("searchKeyword") String searchKeyword) {
         return null;
+    }
+
+    private RsArticle convert(final Article dbArticle) {
+        final RsArticle article = new RsArticle();
+        article.setId(dbArticle.getId());
+        article.setHeadline(dbArticle.getHeadline());
+        article.setShortDescription(dbArticle.getDescription());
+        article.setMainText(dbArticle.getMainText());
+        
+        return article;
     }
 
 }

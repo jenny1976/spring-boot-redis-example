@@ -13,6 +13,15 @@ public class RsKeyword implements Serializable {
     private Long id;
     private String name;
 
+    public RsKeyword() {
+        // default constructor
+    }
+
+    public RsKeyword(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,5 +1,6 @@
 package com.upday.service.web.rs.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -8,13 +9,12 @@ import java.util.List;
  *
  * @author jschulz
  */
-//@XmlRootElement
 public class RsArticle implements Serializable {
     
     private static final long serialVersionUID = -4150137843471878449L;
     
     private Long id;
-    private String header;
+    private String headline;
     private String shortDescription;
     private String mainText;
     
@@ -27,8 +27,8 @@ public class RsArticle implements Serializable {
         return authors;
     }
 
-    public String getHeader() {
-        return header;
+    public String getHeadline() {
+        return headline;
     }
 
     public Long getId() {
@@ -43,6 +43,7 @@ public class RsArticle implements Serializable {
         return mainText;
     }
 
+//    @JsonFormat
     public Date getPublishedOn() {
         return publishedOn;
     }
@@ -55,8 +56,8 @@ public class RsArticle implements Serializable {
         this.authors = authors;
     }
 
-    public void setHeader(String header) {
-        this.header = header;
+    public void setHeadline(String headline) {
+        this.headline = headline;
     }
 
     public void setId(Long id) {
@@ -81,6 +82,9 @@ public class RsArticle implements Serializable {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "RsArticle{" + "id=" + id + ", header=" + headline + ", shortDescription=" 
+                + shortDescription + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
+                + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
+
 }
