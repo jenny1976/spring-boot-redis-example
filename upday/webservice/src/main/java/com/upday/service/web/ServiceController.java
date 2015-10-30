@@ -2,6 +2,7 @@ package com.upday.service.web;
 
 import com.upday.service.persistence.api.ArticleRepository;
 import com.upday.service.persistence.domain.Article;
+import com.upday.service.persistence.domain.Author;
 import com.upday.service.web.rs.domain.RsArticle;
 import com.upday.service.web.rs.domain.RsAuthor;
 import java.util.ArrayList;
@@ -126,8 +127,23 @@ public class ServiceController {
         article.setHeadline(dbArticle.getHeadline());
         article.setShortDescription(dbArticle.getDescription());
         article.setMainText(dbArticle.getMainText());
+        article.setAuthors(convert(dbArticle.getAuthors()));
+        article.setPublishedOn(dbArticle.getPublishedOn());
         
         return article;
     }
 
+    private List<RsAuthor> convert(final List<Author> dbAuthors) {
+        final List<RsAuthor> rsAuthors = new ArrayList<>();
+        for (Author dbAuthor : dbAuthors) {
+            rsAuthors.add(convert(dbAuthor));
+        }
+        return rsAuthors;
+    }
+    
+    private RsAuthor convert(final Author dbAuthor) {
+        final RsAuthor author = new RsAuthor(dbAuthor.getId(), dbAuthor.getFirstname(), 
+                dbAuthor.getLastname());
+        return author;
+    }
 }

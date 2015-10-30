@@ -1,32 +1,32 @@
 create table NEWS_ARTICLE 
 (
-    id INTEGER NOT NULL,
-    headline VARCHAR(300),
-    description VARCHAR(500),
-    maintext VARCHAR(3000),
-    publishedOn DATE,
-    createdOn DATE NOT NULL,
-    updatedOn DATE NOT NULL,
+    ID INTEGER NOT NULL,
+    HEADLINE VARCHAR(300),
+    DESCRIPTION VARCHAR(500),
+    TEXT VARCHAR(3000),
+    PUBLISHED_ON DATE,
+    CREATED_ON DATE NOT NULL,
+    UPDATED_ON DATE NOT NULL,
     PRIMARY KEY (id)
 );
 
 create table NEWS_AUTHOR 
 (
-    id INTEGER NOT NULL,
-    firstname VARCHAR(300),
-    lastname VARCHAR(300),
-    createdOn DATE NOT NULL,
-    updatedOn DATE NOT NULL,
+    ID INTEGER NOT NULL,
+    FIRSTNAME VARCHAR(300),
+    LASTNAME VARCHAR(300),
+    CREATED_ON DATE NOT NULL,
+    UPDATED_ON DATE NOT NULL,
     PRIMARY KEY (id)
 );
 
 create table NEWS_KEYWORD 
 (
-    id INTEGER NOT NULL,
-    name VARCHAR(300),
-    description VARCHAR(300),
-    createdOn DATE NOT NULL,
-    updatedOn DATE NOT NULL,
+    ID INTEGER NOT NULL,
+    NAME VARCHAR(300),
+    DESCRIPTION VARCHAR(300),
+    CREATED_ON DATE NOT NULL,
+    UPDATED_ON DATE NOT NULL,
     PRIMARY KEY (id)
 );
 
