@@ -1,9 +1,11 @@
-package com.upday.service.web.rs.domain;
+package com.upday.newsapi.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -15,10 +17,10 @@ public class RsArticle implements Serializable {
     
     private Long id;
     private String headline;
-    private String shortDescription;
+    private String teaserText;
     private String mainText;
     
-    private Date publishedOn;
+    private LocalDate publishedOn;
     
     private List<RsAuthor> authors;
     private List<RsKeyword> keywords;
@@ -43,13 +45,14 @@ public class RsArticle implements Serializable {
         return mainText;
     }
 
-//    @JsonFormat
-    public Date getPublishedOn() {
+//    @JsonFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    public LocalDate getPublishedOn() {
         return publishedOn;
     }
 
-    public String getShortDescription() {
-        return shortDescription;
+    public String getTeaserText() {
+        return teaserText;
     }
 
     public void setAuthors(List<RsAuthor> authors) {
@@ -72,18 +75,18 @@ public class RsArticle implements Serializable {
         this.mainText = mainText;
     }
 
-    public void setPublishedOn(Date publishedOn) {
+    public void setPublishedOn(LocalDate publishedOn) {
         this.publishedOn = publishedOn;
     }
 
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
+    public void setTeaserText(String teaserText) {
+        this.teaserText = teaserText;
     }
 
     @Override
     public String toString() {
         return "RsArticle{" + "id=" + id + ", header=" + headline + ", shortDescription=" 
-                + shortDescription + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
+                + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
 

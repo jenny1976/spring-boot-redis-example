@@ -1,6 +1,7 @@
 package com.upday.service.web;
 
-import com.upday.service.web.rs.domain.RsArticle;
+import com.upday.newsapi.controller.ServiceController;
+import com.upday.newsapi.model.RsArticle;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;

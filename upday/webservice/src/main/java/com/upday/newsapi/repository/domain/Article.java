@@ -1,8 +1,11 @@
-package com.upday.service.persistence.domain;
+package com.upday.newsapi.repository.domain;
 
-import java.sql.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,7 +13,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import org.hibernate.annotations.Type;
+
 import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -21,6 +27,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class Article extends AbstractPersistable<Long> {
     
     private static final long serialVersionUID = 1651369642672635031L;
+    
    
     @Column(name = "HEADLINE")
     private String headline;
@@ -32,18 +39,18 @@ public class Article extends AbstractPersistable<Long> {
     private String mainText;
     
     @Column(name = "CREATED_ON")
-    private Date createdOn;
+    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
+    private LocalDateTime createdOn;
     
     @Column(name = "UPDATED_ON")
-    private Date updatedOn;
+    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
+    private LocalDateTime updatedOn;
     
     @Column(name = "PUBLISHED_ON")
-    private Date publishedOn;
+    @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDate")
+    private LocalDate publishedOn;
     
-    @ManyToMany(
-            fetch = FetchType.EAGER,
-            targetEntity = Author.class
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
       name="NEWS_ARTICLE_AUTHOR",
       joinColumns={
@@ -53,12 +60,9 @@ public class Article extends AbstractPersistable<Long> {
           @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
       }
     )
-    private List<Author> authors;
+    private Set<Author> authors;
     
-    @ManyToMany(
-            fetch = FetchType.EAGER,
-            targetEntity = Keyword.class
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
       name="NEWS_ARTICLE_KEYWORD",
       joinColumns={
@@ -68,7 +72,7 @@ public class Article extends AbstractPersistable<Long> {
           @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
       }
     )
-    private List<Keyword> keywords;
+    private Set<Keyword> keywords;
 
     public String getHeadline() {
         return headline;
@@ -94,45 +98,62 @@ public class Article extends AbstractPersistable<Long> {
         this.mainText = mainText;
     }
 
-    public Date getCreatedOn() {
+    public LocalDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
     }
 
-    public Date getUpdatedOn() {
+    public LocalDateTime getUpdatedOn() {
         return updatedOn;
     }
 
-    public void setUpdatedOn(Date updatedOn) {
+    public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
     }
 
-    public Date getPublishedOn() {
+    public LocalDate getPublishedOn() {
         return publishedOn;
     }
 
-    public void setPublishedOn(Date publishedOn) {
+    public void setPublishedOn(LocalDate publishedOn) {
         this.publishedOn = publishedOn;
     }
 
-    public List<Author> getAuthors() {
+    public Set<Author> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(List<Author> authors) {
+    public void setAuthors(Set<Author> authors) {
         this.authors = authors;
     }
 
-    public List<Keyword> getKeywords() {
+    public Set<Keyword> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(List<Keyword> keywords) {
+    public void setKeywords(Set<Keyword> keywords) {
         this.keywords = keywords;
     }
+    
+    /*
+     * convenience methods.
+     */
+    public void addKeyword(final Keyword keyword) {
+        if(CollectionUtils.isEmpty(keywords)) {
+            keywords = new HashSet<>();
+        }
+        keywords.add(keyword);
+    }
+    public void addAuthor(final Author author) {
+        if(CollectionUtils.isEmpty(authors)) {
+            authors = new HashSet<>();
+        }
+        authors.add(author);
+    }
+    /**/
 
     @Override
     public int hashCode() {

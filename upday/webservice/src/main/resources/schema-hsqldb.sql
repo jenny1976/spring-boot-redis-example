@@ -1,3 +1,14 @@
+----------------------------------
+
+drop table NEWS_ARTICLE_AUTHOR if exists;
+drop table NEWS_ARTICLE_KEYWORD if exists;
+drop table NEWS_KEYWORD if exists;
+drop table NEWS_AUTHOR if exists;
+drop table NEWS_ARTICLE if exists;
+
+
+--------------------
+
 create table NEWS_ARTICLE 
 (
     ID INTEGER NOT NULL,

@@ -1,7 +1,9 @@
-package com.upday.service.web.config;
+package com.upday.newsapi.configuration;
 
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -20,6 +22,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         configurer.enable();
     }
     
-    
+//    @Bean
+//    public JSR310Module jsr310Module() {
+//        return new JSR310Module();
+//    }
 
 }

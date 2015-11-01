@@ -1,4 +1,4 @@
-package com.upday.service;
+package com.upday.newsapi;
 
 import java.util.Arrays;
 

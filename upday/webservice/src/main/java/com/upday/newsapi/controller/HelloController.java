@@ -1,4 +1,4 @@
-package com.upday.service.web;
+package com.upday.newsapi.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;

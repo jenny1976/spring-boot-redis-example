@@ -1,6 +1,6 @@
-package com.upday.service.web;
+package com.upday.newsapi.controller;
 
-import com.upday.service.web.config.WebConfig;
+import com.upday.newsapi.configuration.WebConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
  

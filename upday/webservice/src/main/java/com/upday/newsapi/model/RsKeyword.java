@@ -1,4 +1,4 @@
-package com.upday.service.web.rs.domain;
+package com.upday.newsapi.model;
 
 import java.io.Serializable;
 

@@ -1,5 +1,6 @@
 package com.upday.service.web;
 
+import com.upday.newsapi.controller.HelloController;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
