@@ -2,20 +2,23 @@ package com.upday.newsapi.repository.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.hibernate.annotations.Type;
+import org.springframework.data.domain.Persistable;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -24,11 +27,14 @@ import org.springframework.util.CollectionUtils;
  */
 @Entity
 @Table(name = "NEWS_ARTICLE")
-public class Article extends AbstractPersistable<Long> {
+public class Article implements Persistable<Long> {
     
     private static final long serialVersionUID = 1651369642672635031L;
     
-   
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
     @Column(name = "HEADLINE")
     private String headline;
     
@@ -137,6 +143,21 @@ public class Article extends AbstractPersistable<Long> {
     public void setKeywords(Set<Keyword> keywords) {
         this.keywords = keywords;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    @Transient
+    public boolean isNew() {
+            return null == getId();
+    }
     
     /*
      * convenience methods.
@@ -158,12 +179,15 @@ public class Article extends AbstractPersistable<Long> {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 71 * hash + Objects.hashCode(this.headline);
-        hash = 71 * hash + Objects.hashCode(this.description);
-        hash = 71 * hash + Objects.hashCode(this.mainText);
-        hash = 71 * hash + Objects.hashCode(this.createdOn);
-        hash = 71 * hash + Objects.hashCode(this.updatedOn);
-        hash = 71 * hash + Objects.hashCode(this.publishedOn);
+        hash = 17 * hash + Objects.hashCode(this.id);
+        hash = 17 * hash + Objects.hashCode(this.headline);
+        hash = 17 * hash + Objects.hashCode(this.description);
+        hash = 17 * hash + Objects.hashCode(this.mainText);
+        hash = 17 * hash + Objects.hashCode(this.createdOn);
+        hash = 17 * hash + Objects.hashCode(this.updatedOn);
+        hash = 17 * hash + Objects.hashCode(this.publishedOn);
+        hash = 17 * hash + Objects.hashCode(this.authors);
+        hash = 17 * hash + Objects.hashCode(this.keywords);
         return hash;
     }
 
@@ -176,6 +200,9 @@ public class Article extends AbstractPersistable<Long> {
             return false;
         }
         final Article other = (Article) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
         if (!Objects.equals(this.headline, other.headline)) {
             return false;
         }
@@ -194,15 +221,21 @@ public class Article extends AbstractPersistable<Long> {
         if (!Objects.equals(this.publishedOn, other.publishedOn)) {
             return false;
         }
+        if (!Objects.equals(this.authors, other.authors)) {
+            return false;
+        }
+        if (!Objects.equals(this.keywords, other.keywords)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "Article{" + "headline=" + headline + ", description=" + description 
-                + ", mainText=" + mainText + ", createdOn=" + createdOn 
-                + ", updatedOn=" + updatedOn + ", publishedOn=" + publishedOn 
-                + ", authors=" + authors + ", keywords=" + keywords + '}';
+        return "Article{" + "id=" + id + ", headline=" + headline + ", description=" 
+                + description + ", mainText=" + mainText + ", createdOn=" + createdOn 
+                + ", updatedOn=" + updatedOn + ", publishedOn=" + publishedOn + ", authors=" 
+                + authors + ", keywords=" + keywords + '}';
     }
   
 }

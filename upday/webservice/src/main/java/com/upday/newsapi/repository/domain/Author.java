@@ -5,10 +5,14 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.springframework.data.domain.Persistable;
 
 /**
  *
@@ -16,10 +20,14 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "NEWS_AUTHOR")
-public class Author  extends AbstractPersistable<Long> {
+public class Author implements Persistable<Long> {
     
     private static final long serialVersionUID = 9180485233031144474L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
     @Column(name = "FIRSTNAME")
     private String firstname;
     
@@ -37,6 +45,21 @@ public class Author  extends AbstractPersistable<Long> {
 
     public Author() {
         // default
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    @Transient
+    public boolean isNew() {
+            return null == getId();
     }
 
     public Set<Article> getArticles() {
@@ -66,9 +89,10 @@ public class Author  extends AbstractPersistable<Long> {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 53 * hash + Objects.hashCode(this.getId());
-        hash = 79 * hash + Objects.hashCode(this.firstname);
-        hash = 79 * hash + Objects.hashCode(this.lastname);
+        hash = 13 * hash + Objects.hashCode(this.id);
+        hash = 13 * hash + Objects.hashCode(this.firstname);
+        hash = 13 * hash + Objects.hashCode(this.lastname);
+        hash = 13 * hash + Objects.hashCode(this.articles);
         return hash;
     }
 
@@ -81,10 +105,16 @@ public class Author  extends AbstractPersistable<Long> {
             return false;
         }
         final Author other = (Author) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
         if (!Objects.equals(this.firstname, other.firstname)) {
             return false;
         }
         if (!Objects.equals(this.lastname, other.lastname)) {
+            return false;
+        }
+        if (!Objects.equals(this.articles, other.articles)) {
             return false;
         }
         return true;
@@ -92,7 +122,6 @@ public class Author  extends AbstractPersistable<Long> {
 
     @Override
     public String toString() {
-        return "Author{" + "firstname=" + firstname + ", lastname=" + lastname + 
-                ", articles=" + articles + '}';
+        return "Author{" + "id=" + id + ", firstname=" + firstname + ", lastname=" + lastname + ", articles=" + articles + '}';
     }
 }
