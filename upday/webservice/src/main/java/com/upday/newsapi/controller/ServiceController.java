@@ -2,18 +2,12 @@ package com.upday.newsapi.controller;
 
 import com.upday.newsapi.repository.ArticleRepository;
 import com.upday.newsapi.repository.domain.Article;
-import com.upday.newsapi.repository.domain.Author;
-import com.upday.newsapi.repository.domain.Keyword;
 import com.upday.newsapi.model.RsArticle;
-import com.upday.newsapi.model.RsAuthor;
-import com.upday.newsapi.model.RsKeyword;
+import com.upday.newsapi.service.ArticleService;
 import java.time.LocalDate;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -35,6 +29,9 @@ public class ServiceController {
     
     @Autowired
     private ArticleRepository articleRepository;
+    
+    @Autowired 
+    private ArticleService articleService;
 
     @RequestMapping(
             value = "/",
@@ -42,14 +39,9 @@ public class ServiceController {
     )
     public @ResponseBody Long createArticle(@RequestBody RsArticle rsArticle) {
 
-        Article article = new Article();
-        article.setHeadline("test headline");
-        article.setMainText("test maintext");
-        article.setDescription("test description");
-        article.setPublishedOn(LocalDate.now());
-        Article save = articleRepository.save(article);
+        Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(rsArticle));
         
-        return save.getId();
+        return article.getId();
     }
 
     @RequestMapping(
@@ -81,7 +73,7 @@ public class ServiceController {
         
         final Article dbArticle = articleRepository.findOne(articleId);
         
-        return convert(dbArticle);
+        return ModelConverter.convert(dbArticle);
     }
 
     /**
@@ -96,7 +88,7 @@ public class ServiceController {
     public @ResponseBody List<RsArticle> getArticleByAuthor(@PathVariable("authorId") Long authorId) {
         Assert.notNull(authorId);
         final List<Article> articles = articleRepository.findByAuthorsId(authorId);
-        return convertArticles(articles);
+        return ModelConverter.convertArticles(articles);
     }
 
     /**
@@ -133,54 +125,7 @@ public class ServiceController {
             @PathVariable("searchKeyword") String searchKeyword) {
         Assert.notNull(searchKeyword);
         final List<Article> articles = articleRepository.findByKeywordsNameIgnoreCase(searchKeyword);
-        return convertArticles(articles);
+        return ModelConverter.convertArticles(articles);
     }
 
-    private RsArticle convert(final Article dbArticle) {
-        final RsArticle article = new RsArticle();
-        article.setId(dbArticle.getId());
-        article.setHeadline(dbArticle.getHeadline());
-        article.setTeaserText(dbArticle.getDescription());
-        article.setMainText(dbArticle.getMainText());
-        article.setAuthors(convertAuthors(dbArticle.getAuthors()));
-        article.setKeywords(convertKeywords(dbArticle.getKeywords()));
-        article.setPublishedOn(dbArticle.getPublishedOn());
-        
-        return article;
-    }
-
-    private List<RsAuthor> convertAuthors(final Set<Author> dbAuthors) {
-        final List<RsAuthor> rsAuthors = new ArrayList<>();
-        for (Author dbAuthor : dbAuthors) {
-            rsAuthors.add(convert(dbAuthor));
-        }
-        return rsAuthors;
-    }
-    
-    private RsAuthor convert(final Author dbAuthor) {
-        final RsAuthor author = new RsAuthor(dbAuthor.getId(), dbAuthor.getFirstname(), 
-                dbAuthor.getLastname());
-        return author;
-    }
-    
-    private List<RsKeyword> convertKeywords(final Set<Keyword> dbKeywords) {
-        final List<RsKeyword> rsKeywords = new ArrayList<>();
-        for (Keyword dbKeyword : dbKeywords) {
-            rsKeywords.add(convert(dbKeyword));
-        }
-        return rsKeywords;
-    }
-    
-    private RsKeyword convert(final Keyword dbKeyword) {
-        final RsKeyword keyword = new RsKeyword(dbKeyword.getId(), dbKeyword.getName());
-        return keyword;
-    }
-
-    private List<RsArticle> convertArticles(final List<Article> dbArticles) {
-        final List<RsArticle> rsArticles = new ArrayList<>();
-        for (Article article : dbArticles) {
-            rsArticles.add(convert(article));
-        }
-        return rsArticles;
-    }
 }
