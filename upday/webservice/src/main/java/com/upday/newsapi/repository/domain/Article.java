@@ -2,9 +2,11 @@ package com.upday.newsapi.repository.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import javax.persistence.CascadeType;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,11 +16,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
 import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
-
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -35,20 +39,20 @@ public class Article implements Persistable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "HEADLINE")
+    @Column(name = "HEADLINE", nullable = false, length = 300)
     private String headline;
     
-    @Column(name = "DESCRIPTION")
+    @Column(name = "DESCRIPTION", length = 500)
     private String description;
     
-    @Column(name = "TEXT")
+    @Column(name = "TEXT", length = 3000)
     private String mainText;
     
-    @Column(name = "CREATED_ON")
+    @Column(name = "CREATED_ON", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime createdOn;
     
-    @Column(name = "UPDATED_ON")
+    @Column(name = "UPDATED_ON", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime updatedOn;
     
@@ -56,29 +60,29 @@ public class Article implements Persistable<Long> {
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDate")
     private LocalDate publishedOn;
     
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
       name="NEWS_ARTICLE_AUTHOR",
       joinColumns={
-          @JoinColumn(name="AUTHOR_ID", referencedColumnName="ID")
+          @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
       },
       inverseJoinColumns={
-          @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
+          @JoinColumn(name="AUTHOR_ID", referencedColumnName="ID")
       }
     )
-    private Set<Author> authors;
+    private List<Author> authors;
     
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
       name="NEWS_ARTICLE_KEYWORD",
       joinColumns={
-          @JoinColumn(name="KEYWORD_ID", referencedColumnName="ID")
+          @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
       },
       inverseJoinColumns={
-          @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
+          @JoinColumn(name="KEYWORD_ID", referencedColumnName="ID")
       }
     )
-    private Set<Keyword> keywords;
+    private List<Keyword> keywords;
 
     public String getHeadline() {
         return headline;
@@ -128,19 +132,19 @@ public class Article implements Persistable<Long> {
         this.publishedOn = publishedOn;
     }
 
-    public Set<Author> getAuthors() {
+    public List<Author> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(Set<Author> authors) {
+    public void setAuthors(List<Author> authors) {
         this.authors = authors;
     }
 
-    public Set<Keyword> getKeywords() {
+    public List<Keyword> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(Set<Keyword> keywords) {
+    public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
     }
 
@@ -159,18 +163,28 @@ public class Article implements Persistable<Long> {
             return null == getId();
     }
     
+    @PrePersist
+    public void setDefaultDates() {
+        this.updatedOn = LocalDateTime.now();
+        this.createdOn = LocalDateTime.now();
+    }
+    @PreUpdate
+    public void updateUpdated() {
+        this.updatedOn = LocalDateTime.now();
+    }
+    
     /*
      * convenience methods.
      */
     public void addKeyword(final Keyword keyword) {
         if(CollectionUtils.isEmpty(keywords)) {
-            keywords = new HashSet<>();
+            keywords = new ArrayList<>();
         }
         keywords.add(keyword);
     }
     public void addAuthor(final Author author) {
         if(CollectionUtils.isEmpty(authors)) {
-            authors = new HashSet<>();
+            authors = new ArrayList<>();
         }
         authors.add(author);
     }
