@@ -1,11 +1,10 @@
 package com.upday.newsapi.controller;
 
-import com.upday.newsapi.repository.ArticleRepository;
 import com.upday.newsapi.repository.domain.Article;
 import com.upday.newsapi.model.RsArticle;
 import com.upday.newsapi.service.ArticleService;
-import java.time.LocalDate;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -27,9 +26,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value = "/articles")
 public class ServiceController {
     
-    @Autowired
-    private ArticleRepository articleRepository;
-    
     @Autowired 
     private ArticleService articleService;
 
@@ -37,11 +33,11 @@ public class ServiceController {
             value = "/",
             method = RequestMethod.PUT
     )
-    public @ResponseBody Long createArticle(@RequestBody RsArticle rsArticle) {
-
-        Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(rsArticle));
+    public @ResponseBody RsArticle createArticle(@RequestBody RsArticle rsArticle) {
+        Assert.notNull(rsArticle, "The RsArticle should not be null.");
+        final Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(rsArticle));
         
-        return article.getId();
+        return ModelConverter.convert(article);
     }
 
     @RequestMapping(
@@ -50,9 +46,13 @@ public class ServiceController {
     )
     public @ResponseBody RsArticle updateArticle(@PathVariable("articleId") Long articleId, 
             @RequestBody RsArticle rsArticle) {
-
+        Assert.notNull(articleId, "The pathvariable 'articleId' should not be null.");
+        Assert.notNull(rsArticle, "The RsArticle should not be null.");
         
-        return null;
+        rsArticle.setId(articleId);
+        final Article article = articleService.updateArticle(ModelConverter.convertToJpaArticle(rsArticle));
+        
+        return ModelConverter.convert(article);
     }
 
     @RequestMapping(
@@ -60,8 +60,8 @@ public class ServiceController {
             method = RequestMethod.DELETE
     )
     public void deleteArticle(@PathVariable("articleId") Long articleId) {
-        Assert.isNull(articleId);
-        articleRepository.delete(articleId);
+        Assert.notNull(articleId);
+        articleService.deleteArticle(articleId);
     }
     
     @RequestMapping(
@@ -71,7 +71,7 @@ public class ServiceController {
     public RsArticle getArticle(@PathVariable("articleId") Long articleId) {
         Assert.notNull(articleId);
         
-        final Article dbArticle = articleRepository.findOne(articleId);
+        final Article dbArticle = articleService.findOne(articleId);
         
         return ModelConverter.convert(dbArticle);
     }
@@ -87,7 +87,7 @@ public class ServiceController {
     )
     public @ResponseBody List<RsArticle> getArticleByAuthor(@PathVariable("authorId") Long authorId) {
         Assert.notNull(authorId);
-        final List<Article> articles = articleRepository.findByAuthorsId(authorId);
+        final List<Article> articles = articleService.findByAuthorId(authorId);
         return ModelConverter.convertArticles(articles);
     }
 
@@ -105,6 +105,9 @@ public class ServiceController {
     )
     public @ResponseBody List<RsArticle> getArticleByDateRange(@PathVariable("from") String fromDate,
             @PathVariable("to") String toDate) {
+        
+        Assert.notNull(fromDate);
+        Assert.notNull(toDate);
         
         LocalDate from = LocalDate.parse(fromDate, DateTimeFormatter.ISO_DATE);
         LocalDate to = LocalDate.parse(toDate, DateTimeFormatter.ISO_DATE);
@@ -124,7 +127,7 @@ public class ServiceController {
     public @ResponseBody List<RsArticle> getArticleByKeyword(
             @PathVariable("searchKeyword") String searchKeyword) {
         Assert.notNull(searchKeyword);
-        final List<Article> articles = articleRepository.findByKeywordsNameIgnoreCase(searchKeyword);
+        final List<Article> articles = articleService.findByKeywordName(searchKeyword);
         return ModelConverter.convertArticles(articles);
     }
 
