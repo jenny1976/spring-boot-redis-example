@@ -1,8 +1,10 @@
 package com.upday.newsapi.controller;
 
+import com.upday.newsapi.model.CreateArticle;
 import com.upday.newsapi.model.RsArticle;
 import com.upday.newsapi.model.RsAuthor;
 import com.upday.newsapi.model.RsKeyword;
+import com.upday.newsapi.model.UpdateArticle;
 import com.upday.newsapi.repository.domain.Article;
 import com.upday.newsapi.repository.domain.Author;
 import com.upday.newsapi.repository.domain.Keyword;
@@ -83,6 +85,51 @@ public final class ModelConverter {
         dbArticle.setId(article.getId());
         dbArticle.setMainText(article.getMainText());
         dbArticle.setPublishedOn(article.getPublishedOn());
+        
+        if(!CollectionUtils.isEmpty(article.getAuthors())) {
+            for(RsAuthor author : article.getAuthors()) {
+                dbArticle.addAuthor(convertToJpaAuthor(author));
+            }
+        }
+        
+        if(!CollectionUtils.isEmpty(article.getKeywords())) {
+            for(RsKeyword keyword : article.getKeywords()) {
+                dbArticle.addKeyword(convertToJpaKeyword(keyword));
+            }
+        }
+        return dbArticle;
+    }
+    
+    protected static Article convertToJpaArticle(final CreateArticle article) {
+        final Article dbArticle = new Article();
+        
+        dbArticle.setDescription(article.getTeaserText());
+        dbArticle.setHeadline(article.getHeadline());
+        dbArticle.setMainText(article.getMainText());
+        dbArticle.setPublishedOn(article.publishedOnAsLocalDate());
+        
+        if(!CollectionUtils.isEmpty(article.getAuthors())) {
+            for(RsAuthor author : article.getAuthors()) {
+                dbArticle.addAuthor(convertToJpaAuthor(author));
+            }
+        }
+        
+        if(!CollectionUtils.isEmpty(article.getKeywords())) {
+            for(RsKeyword keyword : article.getKeywords()) {
+                dbArticle.addKeyword(convertToJpaKeyword(keyword));
+            }
+        }
+        return dbArticle;
+    }
+    
+    protected static Article convertToJpaArticle(final UpdateArticle article, final Long id) {
+        final Article dbArticle = new Article();
+        
+        dbArticle.setId(id);
+        dbArticle.setDescription(article.getTeaserText());
+        dbArticle.setHeadline(article.getHeadline());
+        dbArticle.setMainText(article.getMainText());
+        dbArticle.setPublishedOn(article.publishedOnAsLocalDate());
         
         if(!CollectionUtils.isEmpty(article.getAuthors())) {
             for(RsAuthor author : article.getAuthors()) {

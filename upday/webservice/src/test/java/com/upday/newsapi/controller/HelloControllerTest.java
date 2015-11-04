@@ -1,4 +1,4 @@
-package com.upday.service.web;
+package com.upday.newsapi.controller;
 
 import com.upday.newsapi.controller.HelloController;
 import static org.hamcrest.Matchers.equalTo;

@@ -6,6 +6,7 @@ import com.upday.newsapi.repository.KeywordRepository;
 import com.upday.newsapi.repository.domain.Article;
 import com.upday.newsapi.repository.domain.Author;
 import com.upday.newsapi.repository.domain.Keyword;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,10 @@ public class ArticleService {
         LOGGER.info("----------------- updateArticle from: " + input);
         Article toUpdate = articleRepository.findOne(input.getId());
         
+        if(null == toUpdate) {
+            return null;
+        }
+        
         final List<Author> detachedAuthors = input.getAuthors();
         final List<Keyword> detachedKeywords = input.getKeywords();
         
@@ -82,8 +87,11 @@ public class ArticleService {
     
     public boolean deleteArticle(Long articleId) {
         LOGGER.info("----------------- delete article with id: " + articleId);
-        
-        articleRepository.delete(articleId);
+        if(articleRepository.exists(articleId)) {
+            articleRepository.delete(articleId);
+        } else {
+            return false;
+        }
         return true;
     }
     
@@ -100,10 +108,16 @@ public class ArticleService {
 
     }
     
-    public List findByKeywordName(final String searchKeyword) {
+    public List<Article> findByKeywordName(final String searchKeyword) {
         LOGGER.info("----------------- find articles by keyword: " + searchKeyword);
         return articleRepository.findByKeywordsNameIgnoreCase(searchKeyword);
     }
+    
+    public List<Article> findByDateRange(final LocalDate from, final LocalDate to) {
+        LOGGER.info("----------------- findByDateRange: " + from +" - "+ to);
+        return articleRepository.findByPublishedOnBetween(from, to);
+    }
+    
     
     
     @Transactional
