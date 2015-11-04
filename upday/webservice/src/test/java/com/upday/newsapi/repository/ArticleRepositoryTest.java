@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import static org.hamcrest.Matchers.equalTo;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,7 @@ public class ArticleRepositoryTest {
     public ArticleRepositoryTest() {
     }
     
-    @After
+    @Before
     public void emptyDB() {
         articleRepository.deleteAll();
         authorRepository.deleteAll();
@@ -100,7 +101,9 @@ public class ArticleRepositoryTest {
         articleRepository.save(a);
         Assert.assertEquals(1, articleRepository.count());
         
-        List<Article> articles = articleRepository.findByAuthorsId(1L);
+        Long authorId = a.getAuthors().get(0).getId();
+        
+        List<Article> articles = articleRepository.findByAuthorsId(authorId);
         
         Assert.assertNotNull(articles);
         Assert.assertThat(articles.size(), equalTo(1));
@@ -124,13 +127,15 @@ public class ArticleRepositoryTest {
         Assert.assertThat(articles.size(), equalTo(4));
     }
 
-    @Ignore
     @Test
     public void testFindByPublishedOnBetween() {
         createArticleList();
         
         List<Article> articles = articleRepository.findByPublishedOnBetween(LocalDate.parse("2012-12-12"), LocalDate.now());
         Assert.assertThat(articles.size(), equalTo(2));
+        
+        articles = articleRepository.findByPublishedOnBetween(LocalDate.parse("2012-12-12"), LocalDate.parse("2014-12-12"));
+        Assert.assertThat(articles.size(), equalTo(0));
     }
 
     
@@ -139,9 +144,7 @@ public class ArticleRepositoryTest {
         a.setHeadline("test headline");
         a.setDescription("test description");
         a.setMainText("test main text");
-        a.setCreatedOn(LocalDateTime.now());
         a.setPublishedOn(LocalDate.now());
-        a.setUpdatedOn(LocalDateTime.now());
         a.addAuthor(authorRepository.save(new Author("first1", "last1")));
         a.addAuthor(authorRepository.save(new Author("first2", "last2")));
         a.addKeyword(keywordRepository.save(new Keyword("test")));
