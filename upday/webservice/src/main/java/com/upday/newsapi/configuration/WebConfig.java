@@ -1,19 +1,21 @@
 package com.upday.newsapi.configuration;
 
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
-import org.springframework.context.annotation.Bean;
+import java.util.List;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
- *
+ * WebMVC configuration.
  * @author jschulz
  */
 @Configuration
-@EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
 
         
@@ -22,9 +24,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         configurer.enable();
     }
     
-//    @Bean
-//    public JSR310Module jsr310Module() {
-//        return new JSR310Module();
-//    }
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
+    }
 
 }

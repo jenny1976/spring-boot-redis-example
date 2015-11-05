@@ -1,14 +1,13 @@
 package com.upday.newsapi.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- *
+ * a REST article representation.
+ * 
  * @author jschulz
  */
 public class RsArticle implements Serializable {
@@ -45,8 +44,6 @@ public class RsArticle implements Serializable {
         return mainText;
     }
 
-//    @JsonFormat(pattern="yyyy-MM-dd")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     public LocalDate getPublishedOn() {
         return publishedOn;
     }
