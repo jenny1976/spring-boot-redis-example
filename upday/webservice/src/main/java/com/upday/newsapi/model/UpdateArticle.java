@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
- *
+ * 
  * @author jschulz
  */
 public class UpdateArticle implements Serializable {
@@ -34,6 +34,7 @@ public class UpdateArticle implements Serializable {
     private List<RsKeyword> keywords;
 
     public UpdateArticle() {
+        // default
     }
 
     public UpdateArticle(String headline, String teaserText, String mainText, Date publishedOn) {
@@ -97,7 +98,7 @@ public class UpdateArticle implements Serializable {
 
     @Override
     public String toString() {
-        return "{ headline=" + headline + ", teaserText=" 
+        return "UpdateArticle{ headline=" + headline + ", teaserText=" 
                 + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
