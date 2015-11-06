@@ -7,7 +7,6 @@ import com.upday.newsapi.repository.domain.Article;
 import com.upday.newsapi.repository.domain.Author;
 import com.upday.newsapi.repository.domain.Keyword;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;

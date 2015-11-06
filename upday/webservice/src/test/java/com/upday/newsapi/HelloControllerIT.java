@@ -1,6 +1,5 @@
 package com.upday.newsapi;
 
-import com.upday.newsapi.Application;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
