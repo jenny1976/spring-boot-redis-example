@@ -33,6 +33,15 @@ public class UpdateArticle implements Serializable {
     private List<RsAuthor> authors;
     private List<RsKeyword> keywords;
 
+    public UpdateArticle() {
+    }
+
+    public UpdateArticle(String headline, String teaserText, String mainText, Date publishedOn) {
+        this.headline = headline;
+        this.teaserText = teaserText;
+        this.mainText = mainText;
+        this.publishedOn = publishedOn;
+    }
 
     public String getHeadline() {
         return headline;
@@ -88,7 +97,7 @@ public class UpdateArticle implements Serializable {
 
     @Override
     public String toString() {
-        return "UpdateArticle{ headline=" + headline + ", teaserText=" 
+        return "{ headline=" + headline + ", teaserText=" 
                 + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }

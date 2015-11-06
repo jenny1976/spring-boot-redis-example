@@ -2,9 +2,12 @@ package com.upday.newsapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upday.newsapi.model.CreateArticle;
+import com.upday.newsapi.model.UpdateArticle;
 import com.upday.newsapi.repository.domain.Article;
 import com.upday.newsapi.service.ArticleService;
 import java.sql.Date;
+import java.time.LocalDate;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,23 +61,43 @@ public class ArticlesControllerTest {
     }
 
     
-    @Ignore
     @Test
     public void testCreateArticle() throws Exception {
         System.out.println("----- createArticle");
-        CreateArticle article = new CreateArticle("headline", "subheadline", "text", Date.valueOf("2014-12-12"));
+        CreateArticle article = new CreateArticle(null, "subheadline", "text", Date.valueOf("2014-12-12"));
         
-        when(articleService.createArticle(new Article())).then(AdditionalAnswers.returnsFirstArg());
+        Article dummy = new Article();
+        dummy.setHeadline("headline");
+        dummy.setDescription("subheadline");
+        dummy.setMainText("text");
+        dummy.setPublishedOn(LocalDate.parse("2014-12-12"));
+        when(articleService.updateArticle(dummy)).thenReturn(Mockito.mock(Article.class));
+        
+        // empty request
+        mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+        
+        // ivalid request content 
+        mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'newArticle'."));
+        
+        // ivalid UpdateArticle content 
+        mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(article)))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'newArticle'."));
         
         // valid request
-        MvcResult andExpect = mvc.perform(MockMvcRequestBuilders.put("/articles/")
-                    .contentType(MediaType.APPLICATION_JSON)
+        article.setHeadline("headline");
+        mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(article))
                 )
-                .andExpect(status().isOk())
-                .andReturn();
+                .andExpect(status().isOk());
         
-        System.out.println("response: " + andExpect.getResponse().getContentAsString());
+        verify(articleService, times(1)).createArticle(org.mockito.Matchers.anyObject());
+        
     }
 
     
@@ -110,9 +133,46 @@ public class ArticlesControllerTest {
     @Test
     public void testUpdateArticle() throws Exception {
         System.out.println("----- updateArticle");
+        UpdateArticle article = new UpdateArticle(null, "subheadline", "text", Date.valueOf("2014-12-12"));
         
-//        mvc.perform(MockMvcRequestBuilders.post("/articles/12").accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
+        Article dummy = new Article();
+        dummy.setId(13L);
+        dummy.setHeadline("headline");
+        dummy.setDescription("subheadline");
+        dummy.setMainText("text");
+        dummy.setPublishedOn(LocalDate.parse("2014-12-12"));
+        when(articleService.updateArticle(dummy)).thenReturn(Mockito.mock(Article.class));
+        
+        // empty request
+        mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+        
+        // ivalid request content 
+        mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'updateArticle'."));
+        
+        // ivalid UpdateArticle content 
+        mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(article)))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'updateArticle'."));
+        
+        article.setHeadline("headline");
+        
+        // valid request
+        mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(article)))
+                .andExpect(status().isNoContent())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+        
+        mvc.perform(MockMvcRequestBuilders.post("/articles/13").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(article)))
+                .andExpect(status().isOk());
+        
+        verify(articleService, times(2)).updateArticle(org.mockito.Matchers.anyObject());
+        
     }
 
     @Test

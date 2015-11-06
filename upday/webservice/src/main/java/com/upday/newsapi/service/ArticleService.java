@@ -58,7 +58,6 @@ public class ArticleService {
         
         saveKeywords(detachedKeywords, newArticle.getId());
 
-//        LOGGER.info("----------------- createArticle success: " + articleRepository.getOne(newArticle.getId()));
         return articleRepository.findOne(newArticle.getId());
     }
     
@@ -87,7 +86,7 @@ public class ArticleService {
 
         saveKeywords(detachedKeywords, toUpdate.getId());
         
-        LOGGER.info("----------------- updateArticle success: " + articleRepository.getOne(toUpdate.getId()));
+//        LOGGER.info("----------------- updateArticle success: " + articleRepository.getOne(toUpdate.getId()));
         return articleRepository.getOne(toUpdate.getId());
     }
     

@@ -9,11 +9,11 @@ import com.upday.newsapi.service.ArticleService;
 
 import java.time.LocalDate;
 import java.util.List;
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.apache.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
@@ -65,16 +65,16 @@ public class ArticlesController {
     public ResponseEntity<RsArticle> createArticle(final @RequestBody @Valid CreateArticle newArticle,
             final BindingResult validationResult ) {
         if(validationResult.hasErrors()) {
-            LOGGER.error(validationResult);
-            throw new IllegalArgumentException("There are invalid arguments.");
+            throw new IllegalArgumentException("There are invalid arguments in 'newArticle'.");
         }
-        final Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(newArticle));
         
         ResponseEntity<RsArticle> response;
-        if( article == null ) {
-            response = new ResponseEntity<>(HttpStatus.CONFLICT);
-        } else {
+        try {
+            final Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(newArticle));
             response = new ResponseEntity<>(ModelConverter.convert(article), HttpStatus.OK);
+        } catch (DataIntegrityViolationException dive) {
+            LOGGER.error("article couldn't be saved: " + dive);
+            response = new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         
         return response;
@@ -93,7 +93,7 @@ public class ArticlesController {
     public ResponseEntity<RsArticle> updateArticle(final @PathVariable("articleId") Long articleId, 
             @RequestBody @Valid UpdateArticle updateArticle, final BindingResult validationResult) {
         if(validationResult.hasErrors()) {
-            throw new IllegalArgumentException("There are invalid arguments.");
+            throw new IllegalArgumentException("There are invalid arguments in 'updateArticle'.");
         }
         
         final Article article = articleService.updateArticle(ModelConverter.convertToJpaArticle(updateArticle, articleId));
