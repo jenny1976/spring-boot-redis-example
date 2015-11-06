@@ -8,14 +8,18 @@ import com.upday.newsapi.repository.domain.Keyword;
 import com.upday.newsapi.service.ArticleService;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import org.apache.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,19 +43,31 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 )
 public class ArticlesController {
     
-    @Autowired 
-    private ArticleService articleService;
+    private static final Logger LOGGER = Logger.getLogger(ArticlesController.class);
+     
+    private final ArticleService articleService;
+
+    @Autowired
+    public ArticlesController(final ArticleService articleService) {
+        this.articleService = articleService;
+    }
+    
 
     /**
      * Create a new Article, and if needed also new Authors and Keywords from 
      * the given {@link CreateArticle}.
      * 
      * @param   newArticle  the input
+     * @param   validationResult    result from bean-validation
      * @return  new created {@link RsArticle} and HttpStatusCode
      */
     @RequestMapping( value = "/", method = PUT )
-    public ResponseEntity<RsArticle> createArticle(final @RequestBody @Valid CreateArticle newArticle) {
-        
+    public ResponseEntity<RsArticle> createArticle(final @RequestBody @Valid CreateArticle newArticle,
+            final BindingResult validationResult ) {
+        if(validationResult.hasErrors()) {
+            LOGGER.error(validationResult);
+            throw new IllegalArgumentException("There are invalid arguments.");
+        }
         final Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(newArticle));
         
         ResponseEntity<RsArticle> response;
@@ -65,21 +81,26 @@ public class ArticlesController {
     }
 
     /**
-     * Updates an Article by given article.id from the data {@link UpdateArticle}.
-     * 
-     * @param   articleId       id of the article to change.
-     * @param   updateArticle   the input
-     * @return  the updated {@link RsArticle}
+     * Updates an Article by given article.id from the data
+     * {@link UpdateArticle}.
+     *
+     * @param articleId         id of the article to change.
+     * @param updateArticle     the input
+     * @param validationResult  result from bean-validation
+     * @return the updated {@link RsArticle}
      */
     @RequestMapping( value = "/{articleId}", method = POST )
     public ResponseEntity<RsArticle> updateArticle(final @PathVariable("articleId") Long articleId, 
-            @RequestBody @Valid UpdateArticle updateArticle) {
+            @RequestBody @Valid UpdateArticle updateArticle, final BindingResult validationResult) {
+        if(validationResult.hasErrors()) {
+            throw new IllegalArgumentException("There are invalid arguments.");
+        }
         
         final Article article = articleService.updateArticle(ModelConverter.convertToJpaArticle(updateArticle, articleId));
         
         ResponseEntity<RsArticle> response;
         if( article == null ) {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            response = new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             response = new ResponseEntity<>(ModelConverter.convert(article), HttpStatus.OK);
         }
@@ -97,7 +118,7 @@ public class ArticlesController {
         
         boolean success = articleService.deleteArticle(articleId);
         if(!success) {
-            throw new EntityNotFoundException("Entity not found.");
+            throw new IllegalArgumentException("Invalid articleId!");
         }
     }
     
@@ -114,7 +135,7 @@ public class ArticlesController {
 
         ResponseEntity<RsArticle> response;
         if(dbArticle == null) {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            response = new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             response = new ResponseEntity<>(ModelConverter.convert(dbArticle), HttpStatus.OK);
         }
@@ -128,31 +149,31 @@ public class ArticlesController {
      * @return  an {@link RsArticle} List
      */
     @RequestMapping( value = "/author/{authorId}", method = GET )
-    public @ResponseBody List<RsArticle> getArticleByAuthor(final @PathVariable("authorId") Long authorId) {
+    public @ResponseBody List<RsArticle> getArticlesByAuthor(final @PathVariable("authorId") Long authorId) {
         
         final List<Article> articles = articleService.findByAuthorId(authorId);
         return ModelConverter.convertArticles(articles);
     }
 
     /**
-     * the given Date-Strings must be in ISO-8601 format: yyyy-MM-dd
+     * the given Date Objects must be in ISO-8601 format: yyyy-MM-dd
      * e.g. '2011-06-23'
      * 
-     * @param fromDate  start-Date
-     * @param toDate    end-Date
+     * @param fromDate  start-Date, mandatory parameter
+     * @param toDate    end-Date, mandatory parameter
+     * 
      * @return  an {@link RsArticle} List
      */
     @RequestMapping( value = "/date/{from}/{to}", method = GET )
-    public @ResponseBody List<RsArticle> getArticleByDateRange(final @PathVariable("from") String fromDate,
-            final @PathVariable("to") String toDate) {
+    public @ResponseBody List<RsArticle> getArticlesByDateRange(
+            final @PathVariable("from") @DateTimeFormat(iso=ISO.DATE) LocalDate fromDate,
+            final @PathVariable("to") @DateTimeFormat(iso=ISO.DATE) LocalDate toDate) {
         
-        final LocalDate from = LocalDate.parse(fromDate, DateTimeFormatter.ISO_DATE);
-        final LocalDate to = LocalDate.parse(toDate, DateTimeFormatter.ISO_DATE);
         List<RsArticle> result;
         
-        if(from.isBefore(to)) {
+        if(fromDate.isBefore(toDate)) {
             // find articles
-            final List<Article> findByDateRange = articleService.findByDateRange(from, to);
+            final List<Article> findByDateRange = articleService.findByDateRange(fromDate, toDate);
             result = ModelConverter.convertArticles(findByDateRange);
         } else {
             throw new IllegalArgumentException("First Date has to be before the second one!");
@@ -167,10 +188,15 @@ public class ArticlesController {
      * @return  an {@link RsArticle} List
      */
     @RequestMapping( value = "/search/{searchKeyword}", method = GET )
-    public @ResponseBody List<RsArticle> getArticleByKeyword(final @PathVariable("searchKeyword") String searchKeyword) {
+    public @ResponseBody List<RsArticle> getArticlesByKeyword(final @PathVariable("searchKeyword") String searchKeyword) {
         
         final List<Article> articles = articleService.findByKeywordName(searchKeyword);
         return ModelConverter.convertArticles(articles);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)    
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) throws Exception {	
+	return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 }

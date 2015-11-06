@@ -28,6 +28,17 @@ public class CreateArticle implements Serializable {
     
     @NotNull
     private Date publishedOn;
+
+    public CreateArticle() {
+        // default
+    }
+
+    public CreateArticle(String headline, String teaserText, String mainText, Date publishedOn) {
+        this.headline = headline;
+        this.teaserText = teaserText;
+        this.mainText = mainText;
+        this.publishedOn = publishedOn;
+    }
     
     private List<RsAuthor> authors;
     private List<RsKeyword> keywords;
@@ -82,6 +93,13 @@ public class CreateArticle implements Serializable {
 
     public void setKeywords(List<RsKeyword> keywords) {
         this.keywords = keywords;
+    }
+
+    @Override
+    public String toString() {
+        return "CreateArticle{" + "headline=" + headline + ", teaserText=" + teaserText 
+                + ", mainText=" + mainText + ", publishedOn=" + publishedOn + ", authors=" 
+                + authors + ", keywords=" + keywords + '}';
     }
     
     

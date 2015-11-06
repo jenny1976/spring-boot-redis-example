@@ -1,6 +1,7 @@
 package com.upday.newsapi.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -52,5 +53,35 @@ public class RsAuthor implements Serializable {
     public String toString() {
         return "RsAuthor{" + "id=" + id + ", firstname=" + firstname + 
                 ", lastname=" + lastname + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.id);
+        hash = 29 * hash + Objects.hashCode(this.firstname);
+        hash = 29 * hash + Objects.hashCode(this.lastname);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RsAuthor other = (RsAuthor) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.firstname, other.firstname)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastname, other.lastname)) {
+            return false;
+        }
+        return true;
     }
 }

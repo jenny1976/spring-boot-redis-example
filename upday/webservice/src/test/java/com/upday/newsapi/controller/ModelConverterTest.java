@@ -49,6 +49,30 @@ public class ModelConverterTest {
         keywords.add(rsKeyword);
         keywords.add(rsKeyword2);
         testRsArticle.setKeywords(keywords);
+        
+        dbArticle.setHeadline("headline");
+        dbArticle.setDescription("description");
+        dbArticle.setMainText("main text");
+        dbArticle.setId(11L);
+        dbArticle.setPublishedOn(LocalDate.parse("2012-12-12"));
+        
+        Author author = new Author("firstname1", "lastname1");
+        author.setId(2L);
+        Author author2 = new Author("firstname2", "lastname2");
+        author2.setId(3L);
+        List<Author> authors = new ArrayList<>(2);
+        authors.add(author);
+        authors.add(author2);
+        dbArticle.setAuthors(authors);
+        
+        Keyword keyword = new Keyword( "keyword1");
+        keyword.setId(5L);
+        Keyword keyword2 = new Keyword( "keyword2");
+        keyword2.setId(6L);
+        List<Keyword> dbKeywords = new ArrayList<>(2);
+        dbKeywords.add(keyword);
+        dbKeywords.add(keyword2);
+        dbArticle.setKeywords(dbKeywords);
     }
     
     @After
@@ -57,22 +81,30 @@ public class ModelConverterTest {
 
     @Test
     public void testConvert_Article() {
-    }
-
-    @Test
-    public void testConvertAuthors() {
-    }
-
-    @Test
-    public void testConvert_Author() {
-    }
-
-    @Test
-    public void testConvertKeywords() {
-    }
-
-    @Test
-    public void testConvert_Keyword() {
+        RsArticle result = ModelConverter.convert(dbArticle);
+        
+        RsArticle expected = new RsArticle();
+        expected.setHeadline("headline");
+        expected.setTeaserText("description");
+        expected.setMainText("main text");
+        expected.setId(11L);
+        expected.setPublishedOn(LocalDate.parse("2012-12-12"));
+        
+        RsAuthor rsAuthor = new RsAuthor(2L, "firstname1", "lastname1");
+        RsAuthor rsAuthor2 = new RsAuthor(3L, "firstname2", "lastname2");
+        List<RsAuthor> rsAuthors = new ArrayList<>(2);
+        rsAuthors.add(rsAuthor);
+        rsAuthors.add(rsAuthor2);
+        expected.setAuthors(rsAuthors);
+        
+        RsKeyword rsKeyword = new RsKeyword(5L, "keyword1");
+        RsKeyword rsKeyword2 = new RsKeyword(6L, "keyword2");
+        List<RsKeyword> keywords = new ArrayList<>(2);
+        keywords.add(rsKeyword);
+        keywords.add(rsKeyword2);
+        expected.setKeywords(keywords);
+        
+        Assert.assertEquals(expected, result);
     }
 
     @Test
@@ -104,14 +136,6 @@ public class ModelConverterTest {
         expected.addKeyword(keyword2);
         
         Assert.assertEquals(expected, result);
-    }
-
-    @Test
-    public void testConvertToJpaAuthor() {
-    }
-
-    @Test
-    public void testConvertToJpaKeyword() {
     }
     
 }

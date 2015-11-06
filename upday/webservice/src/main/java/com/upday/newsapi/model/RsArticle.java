@@ -4,6 +4,7 @@ package com.upday.newsapi.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * a REST article representation.
@@ -87,4 +88,49 @@ public class RsArticle implements Serializable {
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 71 * hash + Objects.hashCode(this.id);
+        hash = 71 * hash + Objects.hashCode(this.headline);
+        hash = 71 * hash + Objects.hashCode(this.teaserText);
+        hash = 71 * hash + Objects.hashCode(this.mainText);
+        hash = 71 * hash + Objects.hashCode(this.publishedOn);
+        hash = 71 * hash + Objects.hashCode(this.authors);
+        hash = 71 * hash + Objects.hashCode(this.keywords);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RsArticle other = (RsArticle) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.headline, other.headline)) {
+            return false;
+        }
+        if (!Objects.equals(this.teaserText, other.teaserText)) {
+            return false;
+        }
+        if (!Objects.equals(this.mainText, other.mainText)) {
+            return false;
+        }
+        if (!Objects.equals(this.publishedOn, other.publishedOn)) {
+            return false;
+        }
+        if (!Objects.equals(this.authors, other.authors)) {
+            return false;
+        }
+        if (!Objects.equals(this.keywords, other.keywords)) {
+            return false;
+        }
+        return true;
+    }
 }

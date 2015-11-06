@@ -26,14 +26,20 @@ public class ArticleService {
     
     private static final Logger LOGGER = Logger.getLogger(ArticleService.class);
     
-    @Autowired
-    private ArticleRepository articleRepository;
+
+    private final ArticleRepository articleRepository;
     
-    @Autowired 
-    private AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
     
+    private final KeywordRepository keywordRepository;
+
     @Autowired
-    private KeywordRepository keywordRepository;
+    public ArticleService(ArticleRepository articleRepository, AuthorRepository authorRepository, 
+            KeywordRepository keywordRepository) {
+        this.articleRepository = articleRepository;
+        this.authorRepository = authorRepository;
+        this.keywordRepository = keywordRepository;
+    }
     
     
     public Article createArticle(final Article article) {
@@ -52,7 +58,7 @@ public class ArticleService {
         
         saveKeywords(detachedKeywords, newArticle.getId());
 
-        LOGGER.info("----------------- createArticle success: " + articleRepository.getOne(newArticle.getId()));
+//        LOGGER.info("----------------- createArticle success: " + articleRepository.getOne(newArticle.getId()));
         return articleRepository.findOne(newArticle.getId());
     }
     
