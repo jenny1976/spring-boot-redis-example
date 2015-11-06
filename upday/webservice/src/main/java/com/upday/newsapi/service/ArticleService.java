@@ -133,7 +133,7 @@ public class ArticleService {
             Article entity = articleRepository.getOne(articleId);
             for (Keyword keyword : detachedKeywords) {
 
-                if(keyword.isNew()) {
+                if(keyword.isNew()|| !authorRepository.exists(keyword.getId())) {
                     keyword = keywordRepository.saveAndFlush(keyword);
                 }
                 entity.addKeyword(keywordRepository.findOne(keyword.getId()));
@@ -150,7 +150,7 @@ public class ArticleService {
             Article entity = articleRepository.getOne(articleId);
             for (Author author : detachedAuthors) {
                 
-                if(author.isNew()) {
+                if(author.isNew() || !authorRepository.exists(author.getId())) {
                     author = authorRepository.saveAndFlush(author);
                 }
                 entity.addAuthor(authorRepository.findOne(author.getId()));
