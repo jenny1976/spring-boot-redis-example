@@ -19,6 +19,8 @@ http://www.heise.de/developer/artikel/Im-Gespraech-Kacper-Nowicki-ueber-Best-Pra
 
 ## Part 2: Coding
 
-My solution can be found here
-https://github.com/jenny1976/java-test/pull/1 
+My solution can be found here:
+
+https://github.com/jenny1976/java-test/pull/1
+
 https://github.com/jenny1976/java-test/pull/2 
