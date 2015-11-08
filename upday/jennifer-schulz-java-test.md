@@ -11,8 +11,7 @@ berlin, like to come by and check the news :) For me it's also fun the check som
 Recently i found an interesting article on heise.de about APIs-Design. It was an interview with Kacper Nowicki who is a software architect and engineer with over 20 years of experience.
 He came from Google Poland where he built the developer team for 8 years. Since the beginning of 2015 he is CTO at goeuro.de . 
 A lot of things he said were just so true and reminded me of some situations i experienced at work. From my point of view the most important rule he mentions 
-is keeping an eye on code quality from the start. It might take longer while developing but saves a lot of time afterwards when you need to bugfix or extend the
-software or need to introduce new colleagues to the code. If you haven't read it, see here: 
+is keeping an eye on code quality from the start. It might take longer while developing but saves a lot of time afterwards when you have to do a bugfix, implement new features or need to introduce new colleagues to the code. If you haven't read it, see here: 
 
 http://www.heise.de/developer/artikel/Im-Gespraech-Kacper-Nowicki-ueber-Best-Practices-der-API-Entwicklung-2866936.html 
 
