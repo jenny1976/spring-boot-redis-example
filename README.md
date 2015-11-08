@@ -1,1 +1,1 @@
-# java-test
+# Java test(s) repository
