@@ -20,6 +20,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
@@ -32,35 +34,35 @@ import org.springframework.util.CollectionUtils;
 @Entity
 @Table(name = "NEWS_ARTICLE")
 public class Article implements Persistable<Long> {
-    
+
     private static final long serialVersionUID = 1651369642672635031L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "HEADLINE", nullable = false, length = 300)
     private String headline;
-    
+
     @Column(name = "DESCRIPTION", length = 500)
     private String description;
-    
+
     @Column(name = "TEXT", length = 3000)
     private String mainText;
-    
+
     @Column(name = "CREATED_ON", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime createdOn;
-    
+
     @Column(name = "UPDATED_ON", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime updatedOn;
-    
+
     @Column(name = "PUBLISHED_ON")
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDate")
     private LocalDate publishedOn;
-    
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
       name="NEWS_ARTICLE_AUTHOR",
       joinColumns={
@@ -70,8 +72,9 @@ public class Article implements Persistable<Long> {
           @JoinColumn(name="AUTHOR_ID", referencedColumnName="ID")
       }
     )
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Author> authors;
-    
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
       name="NEWS_ARTICLE_KEYWORD",
@@ -151,7 +154,7 @@ public class Article implements Persistable<Long> {
     public void setId(Long id) {
         this.id = id;
     }
-    
+
     @Override
     public Long getId() {
         return this.id;
@@ -162,7 +165,7 @@ public class Article implements Persistable<Long> {
     public boolean isNew() {
             return null == getId();
     }
-    
+
     @PrePersist
     public void setDefaultDates() {
         this.updatedOn = LocalDateTime.now();
@@ -172,7 +175,7 @@ public class Article implements Persistable<Long> {
     public void updateUpdated() {
         this.updatedOn = LocalDateTime.now();
     }
-    
+
     /*
      * convenience methods.
      */
@@ -246,10 +249,10 @@ public class Article implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "Article{" + "id=" + id + ", headline=" + headline + ", description=" 
-                + description + ", mainText=" + mainText + ", createdOn=" + createdOn 
-                + ", updatedOn=" + updatedOn + ", publishedOn=" + publishedOn + ", authors=" 
+        return "Article{" + "id=" + id + ", headline=" + headline + ", description="
+                + description + ", mainText=" + mainText + ", createdOn=" + createdOn
+                + ", updatedOn=" + updatedOn + ", publishedOn=" + publishedOn + ", authors="
                 + authors + ", keywords=" + keywords + '}';
     }
-  
+
 }
