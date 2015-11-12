@@ -7,11 +7,11 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Repository to manage {@link Keyword} entities.
- * 
+ *
  * @author jschulz
  */
 @Repository
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
-//    findByNameIgnoreCase
+
 }
