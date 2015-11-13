@@ -20,6 +20,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -64,26 +65,32 @@ public class Article implements Persistable<Long> {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-      name="NEWS_ARTICLE_AUTHOR",
-      joinColumns={
-          @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
-      },
-      inverseJoinColumns={
-          @JoinColumn(name="AUTHOR_ID", referencedColumnName="ID")
-      }
+        name="NEWS_ARTICLE_AUTHOR",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {"ARTICLE_ID", "AUTHOR_ID"}, name = "UNIQUE_ARTICLE_AUTHOR")
+        },
+        joinColumns={
+            @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
+        },
+        inverseJoinColumns={
+            @JoinColumn(name="AUTHOR_ID", referencedColumnName="ID")
+        }
     )
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Author> authors;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-      name="NEWS_ARTICLE_KEYWORD",
-      joinColumns={
-          @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
-      },
-      inverseJoinColumns={
-          @JoinColumn(name="KEYWORD_ID", referencedColumnName="ID")
-      }
+        name="NEWS_ARTICLE_KEYWORD",
+        uniqueConstraints = {
+          @UniqueConstraint(columnNames = {"ARTICLE_ID", "KEYWORD_ID"}, name = "UNIQUE_ARTICLE_KEYWORD")
+        },
+        joinColumns={
+            @JoinColumn(name="ARTICLE_ID", referencedColumnName="ID")
+        },
+        inverseJoinColumns={
+            @JoinColumn(name="KEYWORD_ID", referencedColumnName="ID")
+        }
     )
     private List<Keyword> keywords;
 
