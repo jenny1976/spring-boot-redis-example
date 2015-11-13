@@ -38,25 +38,26 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
  */
 @RestController
 @RequestMapping(
-        value = "/articles", 
-        produces = { "application/json" }
+        value = "/articles",
+        produces = { "application/json" },
+        consumes = { "application/json" }
 )
 public class ArticlesController {
-    
+
     private static final Logger LOGGER = Logger.getLogger(ArticlesController.class);
-     
+
     private final ArticleService articleService;
 
     @Autowired
     public ArticlesController(final ArticleService articleService) {
         this.articleService = articleService;
     }
-    
+
 
     /**
-     * Create a new Article, and if needed also new Authors and Keywords from 
+     * Create a new Article, and if needed also new Authors and Keywords from
      * the given {@link CreateArticle}.
-     * 
+     *
      * @param   newArticle  the input
      * @param   validationResult    result from bean-validation
      * @return  new created {@link RsArticle} and HttpStatusCode
@@ -67,7 +68,7 @@ public class ArticlesController {
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'newArticle'.");
         }
-        
+
         ResponseEntity<RsArticle> response;
         try {
             final Article article = articleService.createArticle(ModelConverter.convertToJpaArticle(newArticle));
@@ -76,7 +77,7 @@ public class ArticlesController {
             LOGGER.error("article couldn't be saved: " + dive);
             response = new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        
+
         return response;
     }
 
@@ -90,47 +91,47 @@ public class ArticlesController {
      * @return the updated {@link RsArticle}
      */
     @RequestMapping( value = "/{articleId}", method = POST )
-    public ResponseEntity<RsArticle> updateArticle(final @PathVariable("articleId") Long articleId, 
+    public ResponseEntity<RsArticle> updateArticle(final @PathVariable("articleId") Long articleId,
             @RequestBody @Valid UpdateArticle updateArticle, final BindingResult validationResult) {
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'updateArticle'.");
         }
-        
+
         final Article article = articleService.updateArticle(ModelConverter.convertToJpaArticle(updateArticle, articleId));
-        
+
         ResponseEntity<RsArticle> response;
         if( article == null ) {
             response = new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             response = new ResponseEntity<>(ModelConverter.convert(article), HttpStatus.OK);
         }
-        
+
         return response;
     }
 
     /**
      * Delete an article by id-parameter.
-     * 
+     *
      * @param articleId     article.id
      */
     @RequestMapping( value = "/{articleId}", method = DELETE )
     public void deleteArticle(final @PathVariable("articleId") Long articleId) {
-        
+
         boolean success = articleService.deleteArticle(articleId);
         if(!success) {
             throw new IllegalArgumentException("Invalid articleId!");
         }
     }
-    
+
     /**
      * Get an {@link RsArticle} by a given id.
-     * 
+     *
      * @param   articleId     article.id
      * @return  the {@link RsArticle}
      */
     @RequestMapping( value = "/{articleId}", method = GET )
     public ResponseEntity<RsArticle> getArticle(final @PathVariable("articleId") Long articleId) {
-        
+
         final Article dbArticle = articleService.findOne(articleId);
 
         ResponseEntity<RsArticle> response;
@@ -144,13 +145,13 @@ public class ArticlesController {
 
     /**
      * Get a List of {@link RsArticle}s by a given authorId.
-     * 
+     *
      * @param   authorId    an author.id
      * @return  an {@link RsArticle} List
      */
     @RequestMapping( value = "/author/{authorId}", method = GET )
     public @ResponseBody List<RsArticle> getArticlesByAuthor(final @PathVariable("authorId") Long authorId) {
-        
+
         final List<Article> articles = articleService.findByAuthorId(authorId);
         return ModelConverter.convertArticles(articles);
     }
@@ -158,23 +159,23 @@ public class ArticlesController {
     /**
      * the given Date Objects must be in ISO-8601 format: yyyy-MM-dd
      * e.g. '2011-06-23'
-     * 
+     *
      * @param fromDate  start-Date, mandatory parameter
      * @param toDate    end-Date, mandatory parameter
-     * 
+     *
      * @return  an {@link RsArticle} List
      */
     @RequestMapping( value = "/date/{from}/{to}", method = GET )
     public @ResponseBody List<RsArticle> getArticlesByDateRange(
             final @PathVariable("from") @DateTimeFormat(iso=ISO.DATE) LocalDate fromDate,
             final @PathVariable("to") @DateTimeFormat(iso=ISO.DATE) LocalDate toDate) {
-        
+
         List<RsArticle> result;
-        
+
         if(fromDate.isBefore(toDate)) {
-            // find articles
-            final List<Article> findByDateRange = articleService.findByDateRange(fromDate, toDate);
-            result = ModelConverter.convertArticles(findByDateRange);
+
+            final List<Article> articles = articleService.findByDateRange(fromDate, toDate);
+            result = ModelConverter.convertArticles(articles);
         } else {
             throw new IllegalArgumentException("First Date has to be before the second one!");
         }
@@ -183,19 +184,19 @@ public class ArticlesController {
 
     /**
      * Search the {@link Keyword}.name attribute, return the suitable Articles.
-     * 
+     *
      * @param searchKeyword     the keyword.name
      * @return  an {@link RsArticle} List
      */
     @RequestMapping( value = "/search/{searchKeyword}", method = GET )
     public @ResponseBody List<RsArticle> getArticlesByKeyword(final @PathVariable("searchKeyword") String searchKeyword) {
-        
+
         final List<Article> articles = articleService.findByKeywordName(searchKeyword);
         return ModelConverter.convertArticles(articles);
     }
-    
-    @ExceptionHandler(IllegalArgumentException.class)    
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) throws Exception {	
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) throws Exception {
 	return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
