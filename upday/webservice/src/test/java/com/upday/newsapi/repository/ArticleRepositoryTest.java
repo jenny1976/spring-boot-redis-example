@@ -4,9 +4,7 @@ import com.upday.newsapi.repository.domain.Article;
 import com.upday.newsapi.repository.domain.Author;
 import com.upday.newsapi.repository.domain.Keyword;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.transaction.Transactional;
 import static org.hamcrest.Matchers.equalTo;
 import org.junit.Assert;
@@ -25,117 +23,37 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @Transactional
 @ContextConfiguration(classes = DBConfig.class)
 public class ArticleRepositoryTest {
-    
+
     @Autowired
     private ArticleRepository articleRepository;
-    
+
     @Autowired
     private AuthorRepository authorRepository;
-    
+
     @Autowired
     private KeywordRepository keywordRepository;
-    
+
     public ArticleRepositoryTest() {
     }
-    
+
     @Before
     public void emptyDB() {
-        articleRepository.deleteAll();
-        authorRepository.deleteAll();
-        keywordRepository.deleteAll();
     }
-    
+
     @Test
     public void testInsert() {
-        
+
         Article a = createOne();
-        
+
         articleRepository.save(a);
-        
-        Assert.assertEquals(1, articleRepository.count());
+
+        Assert.assertEquals(3, articleRepository.count());
         Assert.assertEquals(2, a.getKeywords().size());
         Assert.assertEquals(2, a.getAuthors().size());
         Assert.assertNotNull(a.getId());
-        
-    }
-    
-    @Test
-    public void testUpdate() {
-        
-        Article a = createOne();
-        
-        articleRepository.save(a);
-        
-        a = articleRepository.findOne(a.getId());
-        
-        a.setHeadline("changed headline");
-        
-        a = articleRepository.save(a);
-        
-        Assert.assertEquals("changed headline", a.getHeadline());
-        
+
     }
 
-    
-    @Test
-    public void testDelete() {
-        Article a = createOne();
-        
-        articleRepository.save(a);
-        
-        Assert.assertEquals(1, articleRepository.count());
-        
-        Long id = a.getId();
-        articleRepository.delete(a);
-        
-        Assert.assertFalse(articleRepository.exists(id));
-    }
-
-    @Test
-    public void testFindByAuthorsId() {
-        Article a = createOne();
-
-        articleRepository.save(a);
-        Assert.assertEquals(1, articleRepository.count());
-        
-        Long authorId = a.getAuthors().get(0).getId();
-        
-        List<Article> articles = articleRepository.findByAuthorsId(authorId);
-        
-        Assert.assertNotNull(articles);
-        Assert.assertThat(articles.size(), equalTo(1));
-        Assert.assertThat(articles.get(0).getAuthors().size(), equalTo(2));
-    }
-
-    @Test
-    public void testFindByKeywordsNameIgnoreCase() {
-        createArticleList();
-        
-        List<Article> articles = articleRepository.findByKeywordsNameIgnoreCase("test");
-        
-        Assert.assertNotNull(articles);
-        Assert.assertThat(keywordRepository.count(), equalTo(4L));
-        Assert.assertThat(articles.size(), equalTo(2));
-        
-        articles = articleRepository.findByKeywordsNameIgnoreCase("Test");
-        Assert.assertThat(articles.size(), equalTo(2));
-        
-        articles = articleRepository.findByKeywordsNameContainsIgnoreCase("test");
-        Assert.assertThat(articles.size(), equalTo(4));
-    }
-
-    @Test
-    public void testFindByPublishedOnBetween() {
-        createArticleList();
-        
-        List<Article> articles = articleRepository.findByPublishedOnBetween(LocalDate.parse("2012-12-12"), LocalDate.now());
-        Assert.assertThat(articles.size(), equalTo(2));
-        
-        articles = articleRepository.findByPublishedOnBetween(LocalDate.parse("2012-12-12"), LocalDate.parse("2014-12-12"));
-        Assert.assertThat(articles.size(), equalTo(0));
-    }
-
-    
     private Article createOne() {
         Article a = new Article();
         a.setHeadline("test headline");
@@ -146,14 +64,66 @@ public class ArticleRepositoryTest {
         a.addAuthor(authorRepository.save(new Author("first2", "last2")));
         a.addKeyword(keywordRepository.save(new Keyword("test")));
         a.addKeyword(keywordRepository.save(new Keyword("test kw2")));
-        
+
         return a;
     }
-    
-    private void createArticleList() {
-        Set<Article> list = new HashSet<>();
-        list.add(articleRepository.save(createOne()));
-        list.add(articleRepository.save(createOne()));
-        
+
+
+    @Test
+    public void testUpdate() {
+        Article a = articleRepository.findOne(1L);
+
+        a.setHeadline("changed headline");
+
+        a = articleRepository.save(a);
+
+        Assert.assertEquals("changed headline", a.getHeadline());
     }
+
+    @Test
+    public void testDelete() {
+        Assert.assertEquals(2, articleRepository.count());
+
+        articleRepository.delete(1L);
+
+        Assert.assertFalse(articleRepository.exists(1L));
+    }
+
+    @Test
+    public void testFindByAuthorsId() {
+        Assert.assertEquals(2, articleRepository.count());
+
+        List<Article> articles = articleRepository.findByAuthorsId(1L);
+
+        Assert.assertNotNull(articles);
+        Assert.assertThat(articles.size(), equalTo(1));
+        Assert.assertThat(articles.get(0).getAuthors().size(), equalTo(2));
+    }
+
+    @Test
+    public void testFindByKeywordsNameIgnoreCase() {
+
+        List<Article> articles = articleRepository.findByKeywordsNameIgnoreCase("europa");
+
+        Assert.assertNotNull(articles);
+        Assert.assertThat(keywordRepository.count(), equalTo(4L));
+        Assert.assertThat(articles.size(), equalTo(1));
+
+        articles = articleRepository.findByKeywordsNameIgnoreCase("Europa");
+        Assert.assertThat(articles.size(), equalTo(1));
+
+        articles = articleRepository.findByKeywordsNameContainsIgnoreCase("EUROPa");
+        Assert.assertThat(articles.size(), equalTo(1));
+    }
+
+    @Test
+    public void testFindByPublishedOnBetween() {
+
+        List<Article> articles = articleRepository.findByPublishedOnBetween(LocalDate.parse("2012-12-12"), LocalDate.now());
+        Assert.assertThat(articles.size(), equalTo(2));
+
+        articles = articleRepository.findByPublishedOnBetween(LocalDate.parse("2012-12-12"), LocalDate.parse("2014-12-12"));
+        Assert.assertThat(articles.size(), equalTo(0));
+    }
+
 }
