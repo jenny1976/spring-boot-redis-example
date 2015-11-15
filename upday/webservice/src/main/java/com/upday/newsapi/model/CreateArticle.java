@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -14,7 +16,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author jschulz
  */
 public class CreateArticle implements Serializable {
-    
+
     private static final long serialVersionUID = -2308642645711065760L;
 
     @NotBlank
@@ -22,12 +24,16 @@ public class CreateArticle implements Serializable {
 
     @NotBlank
     private String teaserText;
-    
+
     @NotBlank
     private String mainText;
-    
+
     @NotNull
     private Date publishedOn;
+
+    private List<RsAuthor> authors;
+    private List<RsKeyword> keywords;
+
 
     public CreateArticle() {
         // default
@@ -39,9 +45,6 @@ public class CreateArticle implements Serializable {
         this.mainText = mainText;
         this.publishedOn = publishedOn;
     }
-    
-    private List<RsAuthor> authors;
-    private List<RsKeyword> keywords;
 
     public String getHeadline() {
         return headline;
@@ -97,10 +100,10 @@ public class CreateArticle implements Serializable {
 
     @Override
     public String toString() {
-        return "CreateArticle{" + "headline=" + headline + ", teaserText=" + teaserText 
-                + ", mainText=" + mainText + ", publishedOn=" + publishedOn + ", authors=" 
+        return "CreateArticle{" + "headline=" + headline + ", teaserText=" + teaserText
+                + ", mainText=" + mainText + ", publishedOn=" + publishedOn + ", authors="
                 + authors + ", keywords=" + keywords + '}';
     }
-    
-    
+
+
 }

@@ -6,30 +6,31 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
- * 
+ *
  * @author jschulz
  */
 public class UpdateArticle implements Serializable {
-    
+
     private static final long serialVersionUID = -5829600795638058903L;
-    
 
     @NotBlank
     private String headline;
 
     @NotBlank
     private String teaserText;
-    
+
     @NotBlank
     private String mainText;
-    
+
     @NotNull
     private Date publishedOn;
-    
+
     private List<RsAuthor> authors;
     private List<RsKeyword> keywords;
 
@@ -98,9 +99,9 @@ public class UpdateArticle implements Serializable {
 
     @Override
     public String toString() {
-        return "UpdateArticle{ headline=" + headline + ", teaserText=" 
-                + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
+        return "UpdateArticle{ headline=" + headline + ", teaserText="
+                + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
-    
+
 }

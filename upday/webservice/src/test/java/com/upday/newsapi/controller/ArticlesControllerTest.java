@@ -8,9 +8,7 @@ import com.upday.newsapi.service.ArticleService;
 import java.sql.Date;
 import java.time.LocalDate;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.reset;
@@ -53,12 +51,10 @@ public class ArticlesControllerTest {
         System.out.println("----- createArticle");
         CreateArticle article = new CreateArticle(null, "subheadline", "text", Date.valueOf("2014-12-12"));
 
-        Article dummy = new Article();
-        dummy.setHeadline("headline");
-        dummy.setDescription("subheadline");
-        dummy.setMainText("text");
-        dummy.setPublishedOn(LocalDate.parse("2014-12-12"));
-        when(articleService.updateArticle(dummy)).thenReturn(Mockito.mock(Article.class));
+        Article dummy = new Article(null, "headline", "subheadline", "text", LocalDate.parse("2014-12-12"));
+        Article dummy2 = new Article(1L, "headline", "subheadline", "text", LocalDate.parse("2014-12-12"));
+
+        when(articleService.createArticle(dummy)).thenReturn(dummy2);
 
         // empty request
         mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON))
@@ -70,7 +66,7 @@ public class ArticlesControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'newArticle'."));
 
-        // ivalid UpdateArticle content
+        // ivalid CreateArticle content
         mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(article)))
                 .andExpect(status().isBadRequest())
@@ -83,7 +79,7 @@ public class ArticlesControllerTest {
                 )
                 .andExpect(status().isOk());
 
-        verify(articleService, times(1)).createArticle(org.mockito.Matchers.anyObject());
+        verify(articleService, times(1)).createArticle(dummy);
 
     }
 
@@ -120,7 +116,7 @@ public class ArticlesControllerTest {
     @Test
     public void testUpdateArticle() throws Exception {
         System.out.println("----- updateArticle");
-        UpdateArticle article = new UpdateArticle(null, "subheadline", "text", Date.valueOf("2014-12-12"));
+        UpdateArticle toUpdate = new UpdateArticle(null, "subheadline", "text", Date.valueOf("2014-12-12"));
 
         Article dummy = new Article();
         dummy.setId(13L);
@@ -128,7 +124,8 @@ public class ArticlesControllerTest {
         dummy.setDescription("subheadline");
         dummy.setMainText("text");
         dummy.setPublishedOn(LocalDate.parse("2014-12-12"));
-        when(articleService.updateArticle(dummy)).thenReturn(Mockito.mock(Article.class));
+
+        when(articleService.updateArticle(dummy)).thenReturn(dummy);
 
         // empty request
         mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON))
@@ -142,23 +139,23 @@ public class ArticlesControllerTest {
 
         // ivalid UpdateArticle content
         mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(article)))
+                .content(objectMapper.writeValueAsString(toUpdate)))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'updateArticle'."));
 
-        article.setHeadline("headline");
+        toUpdate.setHeadline("headline");
 
         // valid request
-        mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(article)))
+        mvc.perform(MockMvcRequestBuilders.post("/articles/11").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(toUpdate)))
                 .andExpect(status().isNoContent())
                 .andExpect(MockMvcResultMatchers.content().string(""));
 
         mvc.perform(MockMvcRequestBuilders.post("/articles/13").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(article)))
+                .content(objectMapper.writeValueAsString(toUpdate)))
                 .andExpect(status().isOk());
 
-        verify(articleService, times(2)).updateArticle(org.mockito.Matchers.anyObject());
+        verify(articleService, times(1)).updateArticle(dummy);
 
     }
 
@@ -190,7 +187,7 @@ public class ArticlesControllerTest {
         System.out.println("----- getArticle");
 
         // valid
-        when(articleService.findOne(1L)).thenReturn(new Article());
+        when(articleService.findOne(1L)).thenReturn(new Article(1L, "h", "d", "m", LocalDate.now()));
         mvc.perform(MockMvcRequestBuilders.get("/articles/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         verify(articleService, times(1)).findOne(1L);
@@ -201,8 +198,12 @@ public class ArticlesControllerTest {
                 .andExpect(status().isNotFound());
 
         // valid request but not found
-        mvc.perform(MockMvcRequestBuilders.get("/articles/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.get("/articles/100").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+
+        //invalid
+        mvc.perform(MockMvcRequestBuilders.get("/articles/rtz").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
 
     }
 

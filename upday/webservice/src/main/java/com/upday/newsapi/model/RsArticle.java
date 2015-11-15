@@ -3,27 +3,41 @@ package com.upday.newsapi.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * a REST article representation.
- * 
+ *
  * @author jschulz
  */
 public class RsArticle implements Serializable {
-    
+
     private static final long serialVersionUID = -4150137843471878449L;
-    
+
     private Long id;
     private String headline;
     private String teaserText;
     private String mainText;
-    
-    private LocalDate publishedOn;
-    
+
+    private Date publishedOn;
+
     private List<RsAuthor> authors;
     private List<RsKeyword> keywords;
+
+    public RsArticle() {
+    }
+
+    public RsArticle(Long id, String headline, String teaserText, String mainText, Date publishedOn) {
+        this.id = id;
+        this.headline = headline;
+        this.teaserText = teaserText;
+        this.mainText = mainText;
+        this.publishedOn = publishedOn;
+    }
 
     public List<RsAuthor> getAuthors() {
         return authors;
@@ -45,7 +59,7 @@ public class RsArticle implements Serializable {
         return mainText;
     }
 
-    public LocalDate getPublishedOn() {
+    public Date getPublishedOn() {
         return publishedOn;
     }
 
@@ -73,8 +87,12 @@ public class RsArticle implements Serializable {
         this.mainText = mainText;
     }
 
-    public void setPublishedOn(LocalDate publishedOn) {
+    public void setPublishedOn(Date publishedOn) {
         this.publishedOn = publishedOn;
+    }
+    
+    public LocalDate publishedOnAsLocalDate() {
+        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
     }
 
     public void setTeaserText(String teaserText) {
@@ -83,8 +101,8 @@ public class RsArticle implements Serializable {
 
     @Override
     public String toString() {
-        return "RsArticle{" + "id=" + id + ", header=" + headline + ", shortDescription=" 
-                + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn 
+        return "RsArticle{" + "id=" + id + ", header=" + headline + ", shortDescription="
+                + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
 

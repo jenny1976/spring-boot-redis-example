@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.persistence.CascadeType;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,9 +21,9 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-
 import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
 import org.springframework.util.CollectionUtils;
@@ -93,6 +93,18 @@ public class Article implements Persistable<Long> {
         }
     )
     private List<Keyword> keywords;
+
+
+    public Article() {
+    }
+
+    public Article(Long id, String headline, String description, String mainText, LocalDate publishedOn) {
+        this.id = id;
+        this.headline = headline;
+        this.description = description;
+        this.mainText = mainText;
+        this.publishedOn = publishedOn;
+    }
 
     public String getHeadline() {
         return headline;
