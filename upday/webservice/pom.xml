@@ -6,6 +6,8 @@
     <groupId>com.upday.service</groupId>
     <artifactId>news-api</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <description>A RESTful Webservice that can create, update, delete and provide Newsarticles.</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
