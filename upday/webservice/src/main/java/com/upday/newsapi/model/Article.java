@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +15,7 @@ import java.util.Objects;
  *
  * @author jschulz
  */
-public class RsArticle implements Serializable {
+public class Article implements Serializable {
 
     private static final long serialVersionUID = -4150137843471878449L;
 
@@ -25,13 +26,13 @@ public class RsArticle implements Serializable {
 
     private Date publishedOn;
 
-    private List<RsAuthor> authors;
-    private List<RsKeyword> keywords;
+    private List<Author> authors = new ArrayList<>();
+    private List<Keyword> keywords = new ArrayList<>();
 
-    public RsArticle() {
+    public Article() {
     }
 
-    public RsArticle(Long id, String headline, String teaserText, String mainText, Date publishedOn) {
+    public Article(Long id, String headline, String teaserText, String mainText, Date publishedOn) {
         this.id = id;
         this.headline = headline;
         this.teaserText = teaserText;
@@ -39,7 +40,7 @@ public class RsArticle implements Serializable {
         this.publishedOn = publishedOn;
     }
 
-    public List<RsAuthor> getAuthors() {
+    public List<Author> getAuthors() {
         return authors;
     }
 
@@ -51,7 +52,7 @@ public class RsArticle implements Serializable {
         return id;
     }
 
-    public List<RsKeyword> getKeywords() {
+    public List<Keyword> getKeywords() {
         return keywords;
     }
 
@@ -67,7 +68,7 @@ public class RsArticle implements Serializable {
         return teaserText;
     }
 
-    public void setAuthors(List<RsAuthor> authors) {
+    public void setAuthors(List<Author> authors) {
         this.authors = authors;
     }
 
@@ -79,7 +80,7 @@ public class RsArticle implements Serializable {
         this.id = id;
     }
 
-    public void setKeywords(List<RsKeyword> keywords) {
+    public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
     }
 
@@ -90,7 +91,7 @@ public class RsArticle implements Serializable {
     public void setPublishedOn(Date publishedOn) {
         this.publishedOn = publishedOn;
     }
-    
+
     public LocalDate publishedOnAsLocalDate() {
         return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
     }
@@ -127,7 +128,7 @@ public class RsArticle implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final RsArticle other = (RsArticle) obj;
+        final Article other = (Article) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

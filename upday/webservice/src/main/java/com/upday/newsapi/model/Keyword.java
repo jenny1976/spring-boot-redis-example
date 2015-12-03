@@ -7,18 +7,22 @@ import java.util.Objects;
  *
  * @author jschulz
  */
-public class RsKeyword implements Serializable {
-    
+public class Keyword implements Serializable {
+
     private static final long serialVersionUID = -8346511848327080751L;
-    
+
     private Long id;
     private String name;
 
-    public RsKeyword() {
+    public Keyword() {
         // default constructor
     }
 
-    public RsKeyword(Long id, String name) {
+    public Keyword(String name) {
+        this.name = name;
+    }
+    
+    public Keyword(Long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -60,7 +64,7 @@ public class RsKeyword implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final RsKeyword other = (RsKeyword) obj;
+        final Keyword other = (Keyword) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

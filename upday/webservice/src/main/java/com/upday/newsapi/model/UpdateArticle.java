@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
- *
  * @author jschulz
  */
 public class UpdateArticle implements Serializable {
@@ -31,8 +32,8 @@ public class UpdateArticle implements Serializable {
     @NotNull
     private Date publishedOn;
 
-    private List<RsAuthor> authors;
-    private List<RsKeyword> keywords;
+    private List<Author> authors = new ArrayList<>();
+    private List<Keyword> keywords = new ArrayList<>();
 
     public UpdateArticle() {
         // default
@@ -81,19 +82,19 @@ public class UpdateArticle implements Serializable {
         this.publishedOn = publishedOn;
     }
 
-    public List<RsAuthor> getAuthors() {
+    public List<Author> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(List<RsAuthor> authors) {
+    public void setAuthors(List<Author> authors) {
         this.authors = authors;
     }
 
-    public List<RsKeyword> getKeywords() {
+    public List<Keyword> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(List<RsKeyword> keywords) {
+    public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
     }
 
@@ -103,5 +104,48 @@ public class UpdateArticle implements Serializable {
                 + teaserText + ", mainText=" + mainText + ", publishedOn=" + publishedOn
                 + ", authors=" + authors + ", keywords=" + keywords + '}';
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 47 * hash + Objects.hashCode(this.headline);
+        hash = 47 * hash + Objects.hashCode(this.teaserText);
+        hash = 47 * hash + Objects.hashCode(this.mainText);
+        hash = 47 * hash + Objects.hashCode(this.publishedOn);
+        hash = 47 * hash + Objects.hashCode(this.authors);
+        hash = 47 * hash + Objects.hashCode(this.keywords);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UpdateArticle other = (UpdateArticle) obj;
+        if (!Objects.equals(this.headline, other.headline)) {
+            return false;
+        }
+        if (!Objects.equals(this.teaserText, other.teaserText)) {
+            return false;
+        }
+        if (!Objects.equals(this.mainText, other.mainText)) {
+            return false;
+        }
+        if (!Objects.equals(this.publishedOn, other.publishedOn)) {
+            return false;
+        }
+        if (!Objects.equals(this.authors, other.authors)) {
+            return false;
+        }
+        if (!Objects.equals(this.keywords, other.keywords)) {
+            return false;
+        }
+        return true;
+    }
+
 
 }

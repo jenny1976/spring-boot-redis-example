@@ -7,24 +7,29 @@ import java.util.Objects;
  *
  * @author jschulz
  */
-public class RsAuthor implements Serializable {
-    
+public class Author implements Serializable {
+
     private static final long serialVersionUID = 1642920232195642145L;
 
     private Long id;
     private String firstname;
     private String lastname;
 
-    public RsAuthor() {
-        // default constructor 
+    public Author() {
+        // default constructor
     }
 
-    public RsAuthor(Long id, String firstname, String lastname) {
+    public Author(String firstname, String lastname) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+    }
+
+    public Author(Long id, String firstname, String lastname) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
     }
-    
+
     public Long getId() {
         return id;
     }
@@ -51,7 +56,7 @@ public class RsAuthor implements Serializable {
 
     @Override
     public String toString() {
-        return "RsAuthor{" + "id=" + id + ", firstname=" + firstname + 
+        return "RsAuthor{" + "id=" + id + ", firstname=" + firstname +
                 ", lastname=" + lastname + '}';
     }
 
@@ -72,7 +77,7 @@ public class RsAuthor implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final RsAuthor other = (RsAuthor) obj;
+        final Author other = (Author) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
