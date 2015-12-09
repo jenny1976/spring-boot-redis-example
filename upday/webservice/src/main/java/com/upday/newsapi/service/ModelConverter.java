@@ -29,7 +29,7 @@ public final class ModelConverter {
         return newArticle;
     }
 
-    protected static Article convertToArticle(final UpdateArticle article, final Long id) {
+    protected static Article convertToArticle(final UpdateArticle article, final String id) {
         final Article toUpdate = new Article();
 
         toUpdate.setId(id);

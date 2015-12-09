@@ -19,7 +19,7 @@ public class Article implements Serializable {
 
     private static final long serialVersionUID = -4150137843471878449L;
 
-    private Long id;
+    private String id;
     private String headline;
     private String teaserText;
     private String mainText;
@@ -32,7 +32,7 @@ public class Article implements Serializable {
     public Article() {
     }
 
-    public Article(Long id, String headline, String teaserText, String mainText, Date publishedOn) {
+    public Article(String id, String headline, String teaserText, String mainText, Date publishedOn) {
         this.id = id;
         this.headline = headline;
         this.teaserText = teaserText;
@@ -48,7 +48,7 @@ public class Article implements Serializable {
         return headline;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -76,7 +76,7 @@ public class Article implements Serializable {
         this.headline = headline;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

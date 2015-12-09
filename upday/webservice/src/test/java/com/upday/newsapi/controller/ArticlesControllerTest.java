@@ -27,7 +27,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  *
  * @author jschulz
  */
-
 public class ArticlesControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +42,6 @@ public class ArticlesControllerTest {
 
     @After
     public void tearDown() {
-        reset(articleService);
     }
 
 
@@ -53,7 +51,7 @@ public class ArticlesControllerTest {
         CreateArticle article = new CreateArticle(null, "subheadline", "text",
                         Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
-        Article dummy2 = new Article(1L, "headline", "subheadline", "text",
+        Article dummy2 = new Article("1", "headline", "subheadline", "text",
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
         when(articleService.createArticle(article)).thenReturn(dummy2);
@@ -122,13 +120,13 @@ public class ArticlesControllerTest {
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
         Article dummy = new Article();
-        dummy.setId(13L);
+        dummy.setId("13");
         dummy.setHeadline("headline");
         dummy.setTeaserText("subheadline");
         dummy.setMainText("text");
         dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
-        when(articleService.updateArticle(toUpdate, 13L)).thenReturn(dummy);
+        when(articleService.updateArticle(toUpdate, "13")).thenReturn(dummy);
 
         // empty request
         mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON))
@@ -158,7 +156,7 @@ public class ArticlesControllerTest {
                 .content(objectMapper.writeValueAsString(toUpdate)))
                 .andExpect(status().isOk());
 
-        verify(articleService, times(1)).updateArticle(toUpdate, 13L);
+        verify(articleService, times(1)).updateArticle(toUpdate, "13");
 
     }
 
@@ -166,13 +164,13 @@ public class ArticlesControllerTest {
     public void testDeleteArticle() throws Exception {
         System.out.println("----- deleteArticle");
 
-        when(articleService.deleteArticle(1L)).thenReturn(true);
+        when(articleService.deleteArticle("1")).thenReturn(true);
 
         // should be valid
         mvc.perform(MockMvcRequestBuilders.delete("/articles/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(articleService, times(1)).deleteArticle(1L);
+        verify(articleService, times(1)).deleteArticle("1");
 
 
         reset(articleService);
@@ -190,7 +188,7 @@ public class ArticlesControllerTest {
         System.out.println("----- getArticle");
 
         // valid
-        when(articleService.findOne(1L)).thenReturn(new Article(1L, "h", "d", "m",
+        when(articleService.findOne(1L)).thenReturn(new Article("1", "h", "d", "m",
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS))));
         mvc.perform(MockMvcRequestBuilders.get("/articles/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

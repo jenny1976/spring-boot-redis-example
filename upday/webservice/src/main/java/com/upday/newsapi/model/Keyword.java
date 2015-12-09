@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
  * @author jschulz
  */
 public class Keyword implements Serializable {
 
     private static final long serialVersionUID = -8346511848327080751L;
 
-    private Long id;
     private String name;
 
     public Keyword() {
@@ -20,19 +18,6 @@ public class Keyword implements Serializable {
 
     public Keyword(String name) {
         this.name = name;
-    }
-    
-    public Keyword(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -45,13 +30,12 @@ public class Keyword implements Serializable {
 
     @Override
     public String toString() {
-        return "RsKeyword{" + "id=" + id + ", name=" + name + '}';
+        return "RsKeyword{ name=" + name + '}';
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.id);
         hash = 97 * hash + Objects.hashCode(this.name);
         return hash;
     }
@@ -65,9 +49,6 @@ public class Keyword implements Serializable {
             return false;
         }
         final Keyword other = (Keyword) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
         if (!Objects.equals(this.name, other.name)) {
             return false;
         }

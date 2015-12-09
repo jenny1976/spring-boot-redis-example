@@ -28,20 +28,20 @@ public class ArticleService {
 
     private static final Logger LOGGER = Logger.getLogger(ArticleService.class);
 
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    private final RedisList<Article> articles;
-    private final RedisList<Author> authors;
-    private final RedisList<Keyword> keywords;
+//    private final RedisList<Article> articlesQueue;
+//    private final RedisList<Author> authorsQueue;
+//    private final RedisList<Keyword> keywordsQueue;
 
 
     @Autowired
-    public ArticleService(RedisTemplate redisTemplate1) {
-        this.redisTemplate = redisTemplate1;
+    public ArticleService(RedisTemplate template) {
+        this.redisTemplate = template;
 
-        articles = new DefaultRedisList<>("articles", redisTemplate);
-        authors = new DefaultRedisList<>("authors", redisTemplate);
-        keywords = new DefaultRedisList<>("keywords", redisTemplate);
+//        articlesQueue = new DefaultRedisList<>("articles", redisTemplate);
+//        authorsQueue = new DefaultRedisList<>("authors", redisTemplate);
+//        keywordsQueue = new DefaultRedisList<>("keywords", redisTemplate);
     }
 
 
@@ -49,51 +49,35 @@ public class ArticleService {
         LOGGER.info("----------------- createArticle from: " + createArticle);
 
         final Article article = ModelConverter.convertToNewArticle(createArticle);
-
-        final List<Author> detachedAuthors = article.getAuthors();
-        article.setAuthors(new ArrayList<>());
-        final List<Keyword> detachedKeywords = article.getKeywords();
-        article.setKeywords(new ArrayList<>());
-
-//        Article newArticle = articleRepository.save(article);
-
-        // save keywords and authors if new and attach to new article.
-//        saveAuthors(detachedAuthors, newArticle.getId());
-//
-//        saveKeywords(detachedKeywords, newArticle.getId());
-
-        return null;
-    }
-
-    public Article updateArticle(final UpdateArticle input, final Long id) {
-        LOGGER.info("----------------- updateArticle from: " + input);
-        final Article toUpdate = null;//TODO
-
-        if(null == toUpdate) {
+        if(null == article) {
             return null;
         }
 
-        final List<Author> detachedAuthors = input.getAuthors();
-        final List<Keyword> detachedKeywords = input.getKeywords();
+        final String articleId = UUID.randomUUID().toString();
 
-        toUpdate.setAuthors(new ArrayList<>()); // reset attributes
-        toUpdate.setKeywords(new ArrayList<>());
-        toUpdate.setTeaserText(input.getTeaserText());
-        toUpdate.setHeadline(input.getHeadline());
-        toUpdate.setMainText(input.getMainText());
+        saveArticle(article, articleId);
+        saveAuthors(article.getAuthors(), articleId);
+        saveKeywords(article.getKeywords(), articleId);
 
-        // merge
-//        articleRepository.saveAndFlush(toUpdate);
-
-        // save keywords and authors.
-        saveAuthors(detachedAuthors, toUpdate.getId());
-
-        saveKeywords(detachedKeywords, toUpdate.getId());
-
-        return null;
+        article.setId(articleId);
+        return article;
     }
 
-    public boolean deleteArticle(Long articleId) {
+    public Article updateArticle(final UpdateArticle input, final String articleId) {
+        LOGGER.info("----------------- updateArticle from: " + input);
+        final Article article = ModelConverter.convertToArticle(input, articleId);
+        if(null == article) {
+            return null;
+        }
+
+        saveArticle(article, articleId);
+        saveAuthors(article.getAuthors(), articleId);
+        saveKeywords(article.getKeywords(), articleId);
+
+        return article;
+    }
+
+    public boolean deleteArticle(final String articleId) {
         LOGGER.info("----------------- delete article with id: " + articleId);
 //        if(articleRepository.exists(articleId)) {
 //            articleRepository.delete(articleId);
@@ -132,33 +116,42 @@ public class ArticleService {
 
 
 
-    private void saveKeywords(final List<Keyword> keywords, final Long articleId) {
+    private void saveKeywords(final List<Keyword> keywords, final String articleId) {
+
+        redisTemplate.delete("article:"+articleId+":keyword:");
 
         if(!CollectionUtils.isEmpty(keywords)) {
-            for (Keyword keyword : keywords) {
+            keywords.stream().map((keyword) -> {
                 String id = UUID.randomUUID().toString();
-
-                if(redisTemplate.hasKey("keyword:"+id)) {
-
-                }
-
-                redisTemplate.opsForValue().set("keyword:"+id, keyword.getName() + ":article:" + articleId);
-                this.keywords.addFirst(keyword);
-            }
+                redisTemplate.opsForValue().set("article:"+articleId+"keyword:"+id, keyword.getName());
+                return keyword;
+            }).forEach((keyword) -> {
+//                this.keywordsQueue.addFirst(keyword);
+            });
         }
     }
 
-    private void saveAuthors(final List<Author> authors, final Long articleId) {
+    private void saveAuthors(final List<Author> authors, final String articleId) {
+
+        redisTemplate.delete("article:"+articleId+":author:");
 
         if(!CollectionUtils.isEmpty(authors)) {
             authors.stream().map((author) -> {
                 String id = UUID.randomUUID().toString();
-                redisTemplate.opsForValue().set("author:"+id, author + ":article:" + articleId);
+                redisTemplate.opsForValue().set("article:"+articleId+":author:"+id+":firstname", author.getFirstname());
+                redisTemplate.opsForValue().set("article:"+articleId+":author:"+id+":lastname", author.getLastname());
                 return author;
             }).forEach((author) -> {
-                this.authors.add(author);
+//                this.authorsQueue.add(author);
             });
         }
+    }
+
+    private void saveArticle(final Article article, final String articleId) {
+        redisTemplate.opsForValue().set("article:"+articleId+":headline", article.getHeadline());
+        redisTemplate.opsForValue().set("article:"+articleId+":subheadline", article.getTeaserText());
+        redisTemplate.opsForValue().set("article:"+articleId+":maintext", article.getMainText());
+        redisTemplate.opsForValue().set("article:"+articleId+":publishedon", article.getPublishedOn().toString());
     }
 
 }

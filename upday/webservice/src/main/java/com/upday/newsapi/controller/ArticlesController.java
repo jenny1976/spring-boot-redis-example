@@ -89,7 +89,7 @@ public class ArticlesController {
      * @return the updated {@link Article}
      */
     @RequestMapping( value = "/{articleId}", method = POST )
-    public ResponseEntity<Article> updateArticle(final @PathVariable("articleId") Long articleId,
+    public ResponseEntity<Article> updateArticle(final @PathVariable("articleId") String articleId,
             @RequestBody @Valid UpdateArticle updateArticle, final BindingResult validationResult) {
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'updateArticle'.");
@@ -113,7 +113,7 @@ public class ArticlesController {
      * @param articleId     article.id
      */
     @RequestMapping( value = "/{articleId}", method = DELETE )
-    public void deleteArticle(final @PathVariable("articleId") Long articleId) {
+    public void deleteArticle(final @PathVariable("articleId") String articleId) {
 
         boolean success = articleService.deleteArticle(articleId);
         if(!success) {

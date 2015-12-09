@@ -11,7 +11,6 @@ public class Author implements Serializable {
 
     private static final long serialVersionUID = 1642920232195642145L;
 
-    private Long id;
     private String firstname;
     private String lastname;
 
@@ -22,20 +21,6 @@ public class Author implements Serializable {
     public Author(String firstname, String lastname) {
         this.firstname = firstname;
         this.lastname = lastname;
-    }
-
-    public Author(Long id, String firstname, String lastname) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getFirstname() {
@@ -56,14 +41,12 @@ public class Author implements Serializable {
 
     @Override
     public String toString() {
-        return "RsAuthor{" + "id=" + id + ", firstname=" + firstname +
-                ", lastname=" + lastname + '}';
+        return "Author{" + "firstname=" + firstname + ", lastname=" + lastname + '}';
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.id);
         hash = 29 * hash + Objects.hashCode(this.firstname);
         hash = 29 * hash + Objects.hashCode(this.lastname);
         return hash;
@@ -78,9 +61,6 @@ public class Author implements Serializable {
             return false;
         }
         final Author other = (Author) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
         if (!Objects.equals(this.firstname, other.firstname)) {
             return false;
         }
