@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.reset;
@@ -84,7 +85,7 @@ public class ArticlesControllerTest {
     }
 
 
-    @Test
+    @Test @Ignore
     public void testGetArticleByDateRange() throws Exception {
         System.out.println("----- getArticleByDateRange");
 
@@ -183,7 +184,7 @@ public class ArticlesControllerTest {
 
     }
 
-    @Test
+    @Test @Ignore
     public void testGetArticle() throws Exception {
         System.out.println("----- getArticle");
 
@@ -209,7 +210,7 @@ public class ArticlesControllerTest {
 
     }
 
-    @Test
+    @Test @Ignore
     public void testGetArticleByAuthor() throws Exception {
         System.out.println("----- getArticleByAuthor");
 
@@ -222,7 +223,7 @@ public class ArticlesControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
+    @Test @Ignore
     public void testGetArticleByKeyword() throws Exception {
         System.out.println("----- getArticleByKeyword");
 
