@@ -32,13 +32,13 @@ public class ArticlesControllerIT {
 
 	@Before
 	public void setUp() throws Exception {
-		this.base = new URL("http://localhost:" + port + "/");
-		template = new TestRestTemplate();
+            this.base = new URL("http://localhost:" + port + "/");
+            template = new TestRestTemplate();
 	}
 
 	@Test @Ignore
 	public void getHello() throws Exception {
-		ResponseEntity<String> response = template.getForEntity(base.toString(), String.class);
-		assertThat(response.getBody(), equalTo("Service up and running!"));
+            ResponseEntity<String> response = template.getForEntity(base.toString(), String.class);
+            assertThat(response.getBody(), equalTo("Service up and running!"));
 	}
 }

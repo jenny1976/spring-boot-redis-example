@@ -7,28 +7,33 @@ import com.upday.newsapi.model.Keyword;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 /**
- *
  * @author jschulz
  */
+@ContextConfiguration(classes = {RedisConfig.class })
+@RunWith(SpringJUnit4ClassRunner.class)
 public class ArticleServiceTest {
 
-    private RedisTemplate<String, String> template;
+    @Inject
+    private StringRedisTemplate template;
+
+    private RedisAtomicLong articleIdCounter;
 
 
     public ArticleServiceTest() {
@@ -36,12 +41,14 @@ public class ArticleServiceTest {
 
     @Before
     public void setUp() {
-        template = Mockito.mock(RedisTemplate.class);
+//        template = Mockito.mock(StringRedisTemplate.class);
+//        Mockito.when(template.getConnectionFactory()).thenReturn(Mockito.mock(JedisConnectionFactory.class));
+        articleIdCounter = new RedisAtomicLong(KeyUtils.globalAid(), template.getConnectionFactory());
     }
 
     @After
     public void tearDown() {
-        reset(template);
+//        reset(template);
     }
 
     @Test
@@ -52,17 +59,9 @@ public class ArticleServiceTest {
         dummy.setMainText("dummy text");
         dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
-        Article dummy2 = ModelConverter.convertToNewArticle(dummy);
-        dummy2.setId("33");
-
-        ValueOperations operations = Mockito.mock(ValueOperations.class);
-        Mockito.when(template.opsForValue()).thenReturn(operations);
-
-
         final ArticleService toTest = new ArticleService(template);
         Article result = toTest.createArticle(dummy);
 
-        Mockito.verify(operations, times(4)).set(Mockito.anyString(), Mockito.anyString());
         Assert.notNull(result);
         Assert.notNull(result.getId());
         Assert.notNull(result.getHeadline());
@@ -84,14 +83,10 @@ public class ArticleServiceTest {
         dummy.getKeywords().add(new Keyword("hot"));
         dummy.getKeywords().add(new Keyword("stuff"));
 
-        ValueOperations operations = Mockito.mock(ValueOperations.class);
-        Mockito.when(template.opsForValue()).thenReturn(operations);
-
 
         final ArticleService toTest = new ArticleService(template);
         Article result = toTest.createArticle(dummy);
 
-        Mockito.verify(operations, times(10)).set(Mockito.anyString(), Mockito.anyString());
         Assert.notNull(result);
         Assert.notNull(result.getId());
         Assert.notEmpty(result.getAuthors());
@@ -105,27 +100,21 @@ public class ArticleServiceTest {
     @Test
     public void testDeleteArticle() {
 
-//        Mockito.when(articleRepository.exists(1L)).thenReturn(false);
-//        Mockito.when(articleRepository.exists(2L)).thenReturn(true);
 
         final ArticleService toTest = new ArticleService(template);
 
         boolean res = toTest.deleteArticle("1");
         boolean res2 = toTest.deleteArticle("1");
 
-//        verify(articleRepository, times(1)).exists(1L);
-//        verify(articleRepository, times(1)).exists(2L);
     }
 
     @Test
     public void testFindOne() {
-//        Mockito.stub(articleRepository.findOne(1L)).toReturn(new Article());
 
         final ArticleService toTest = new ArticleService(template);
-        Article result = toTest.findOne(1L);
+        Article result = toTest.findOne("1");
 
         Assert.notNull(result);
-//        verify(articleRepository, times(1)).findOne(1L);
     }
 
 }

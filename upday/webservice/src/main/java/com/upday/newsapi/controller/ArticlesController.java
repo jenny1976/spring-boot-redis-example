@@ -68,11 +68,11 @@ public class ArticlesController {
         }
 
         ResponseEntity<Article> response;
-        try {
-            final Article article = articleService.createArticle(newArticle);
+
+        final Article article = articleService.createArticle(newArticle);
+        if( null!=article ) {
             response = new ResponseEntity<>(article, HttpStatus.OK);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error("article couldn't be saved: " + dive);
+        } else {
             response = new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
@@ -128,7 +128,7 @@ public class ArticlesController {
      * @return  the {@link Article}
      */
     @RequestMapping( value = "/{articleId}", method = GET )
-    public ResponseEntity<Article> getArticle(final @PathVariable("articleId") Long articleId) {
+    public ResponseEntity<Article> getArticle(final @PathVariable("articleId") String articleId) {
 
         final Article dbArticle = articleService.findOne(articleId);
 

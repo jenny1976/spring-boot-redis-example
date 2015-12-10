@@ -188,11 +188,11 @@ public class ArticlesControllerTest {
         System.out.println("----- getArticle");
 
         // valid
-        when(articleService.findOne(1L)).thenReturn(new Article("1", "h", "d", "m",
+        when(articleService.findOne("1")).thenReturn(new Article("1", "h", "d", "m",
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS))));
         mvc.perform(MockMvcRequestBuilders.get("/articles/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        verify(articleService, times(1)).findOne(1L);
+        verify(articleService, times(1)).findOne("1");
         reset(articleService);
 
         // empty

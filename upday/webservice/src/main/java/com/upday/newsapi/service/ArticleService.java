@@ -7,16 +7,18 @@ import com.upday.newsapi.model.Keyword;
 import com.upday.newsapi.model.UpdateArticle;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.support.collections.DefaultRedisList;
-import org.springframework.data.redis.support.collections.RedisList;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.hash.DecoratingStringHashMapper;
+import org.springframework.data.redis.hash.HashMapper;
+import org.springframework.data.redis.hash.JacksonHashMapper;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -28,7 +30,14 @@ public class ArticleService {
 
     private static final Logger LOGGER = Logger.getLogger(ArticleService.class);
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
+
+    private final ValueOperations<String, String> valueOps;
+
+    private final RedisAtomicLong articleIdCounter;
+
+    private final HashMapper<Article, String, String> postMapper = new DecoratingStringHashMapper<Article>(
+			new JacksonHashMapper<Article>(Article.class));
 
 //    private final RedisList<Article> articlesQueue;
 //    private final RedisList<Author> authorsQueue;
@@ -36,14 +45,15 @@ public class ArticleService {
 
 
     @Autowired
-    public ArticleService(RedisTemplate template) {
+    public ArticleService(StringRedisTemplate template) {
         this.redisTemplate = template;
+        this.valueOps = template.opsForValue();
+        this.articleIdCounter = new RedisAtomicLong(KeyUtils.globalAid(), template.getConnectionFactory());
 
 //        articlesQueue = new DefaultRedisList<>("articles", redisTemplate);
 //        authorsQueue = new DefaultRedisList<>("authors", redisTemplate);
 //        keywordsQueue = new DefaultRedisList<>("keywords", redisTemplate);
     }
-
 
     public Article createArticle(final CreateArticle createArticle) {
         LOGGER.info("----------------- createArticle from: " + createArticle);
@@ -53,7 +63,7 @@ public class ArticleService {
             return null;
         }
 
-        final String articleId = UUID.randomUUID().toString();
+        final String articleId = String.valueOf(articleIdCounter.incrementAndGet());
 
         saveArticle(article, articleId);
         saveAuthors(article.getAuthors(), articleId);
@@ -87,9 +97,9 @@ public class ArticleService {
         return true;
     }
 
-    public Article findOne(final Long articleId) {
+    public Article findOne(final String articleId) {
         LOGGER.info("----------------- find article with id: " + articleId);
-//        return articleRepository.findOne(articleId);
+//        redisTemplate.opsForValue().multiGet(null)
         return new Article();
     }
 
@@ -123,7 +133,7 @@ public class ArticleService {
         if(!CollectionUtils.isEmpty(keywords)) {
             keywords.stream().map((keyword) -> {
                 String id = UUID.randomUUID().toString();
-                redisTemplate.opsForValue().set("article:"+articleId+"keyword:"+id, keyword.getName());
+                redisTemplate.opsForValue().set("article:"+articleId+":keyword:"+id, keyword.getName());
                 return keyword;
             }).forEach((keyword) -> {
 //                this.keywordsQueue.addFirst(keyword);
@@ -154,4 +164,7 @@ public class ArticleService {
         redisTemplate.opsForValue().set("article:"+articleId+":publishedon", article.getPublishedOn().toString());
     }
 
+    public boolean isArticleValid(String id) {
+        return redisTemplate.hasKey(KeyUtils.articleId(id));
+    }
 }
