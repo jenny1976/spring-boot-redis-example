@@ -49,11 +49,10 @@ public class ArticlesControllerTest {
     @Test
     public void testCreateArticle() throws Exception {
         System.out.println("----- createArticle");
-        CreateArticle article = new CreateArticle(null, "subheadline", "text",
-                        Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
+        CreateArticle article = new CreateArticle(null, "subheadline", "text");
 
         Article dummy2 = new Article("1", "headline", "subheadline", "text",
-                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
         when(articleService.createArticle(article)).thenReturn(dummy2);
 
@@ -102,12 +101,12 @@ public class ArticlesControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string(""));
 
         // empty
-        mvc.perform(MockMvcRequestBuilders.get("/articles/date/").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
         mvc.perform(MockMvcRequestBuilders.get("/articles/date/2013-12-12/").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         // invalid date-range
+        mvc.perform(MockMvcRequestBuilders.get("/articles/date/").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
         mvc.perform(MockMvcRequestBuilders.get("/articles/date/2013-12-12/2012-12-12").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("First Date has to be before the second one!"));
@@ -118,14 +117,14 @@ public class ArticlesControllerTest {
     public void testUpdateArticle() throws Exception {
         System.out.println("----- updateArticle");
         UpdateArticle toUpdate = new UpdateArticle(null, "subheadline", "text",
-                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
         Article dummy = new Article();
         dummy.setId("13");
         dummy.setHeadline("headline");
         dummy.setTeaserText("subheadline");
         dummy.setMainText("text");
-        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
+        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
         when(articleService.updateArticle(toUpdate, "13")).thenReturn(dummy);
 
@@ -184,13 +183,13 @@ public class ArticlesControllerTest {
 
     }
 
-    @Test @Ignore
+    @Test
     public void testGetArticle() throws Exception {
         System.out.println("----- getArticle");
 
         // valid
         when(articleService.findOne("1")).thenReturn(new Article("1", "h", "d", "m",
-                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS))));
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString()));
         mvc.perform(MockMvcRequestBuilders.get("/articles/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         verify(articleService, times(1)).findOne("1");
@@ -203,10 +202,6 @@ public class ArticlesControllerTest {
         // valid request but not found
         mvc.perform(MockMvcRequestBuilders.get("/articles/100").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-
-        //invalid
-        mvc.perform(MockMvcRequestBuilders.get("/articles/rtz").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
 
     }
 

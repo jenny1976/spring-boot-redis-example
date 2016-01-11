@@ -13,11 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,6 +30,7 @@ public class ArticleServiceTest {
     private StringRedisTemplate template;
 
     private RedisAtomicLong articleIdCounter;
+    private RedisAtomicLong authorIdCounter;
 
 
     public ArticleServiceTest() {
@@ -43,7 +40,8 @@ public class ArticleServiceTest {
     public void setUp() {
 //        template = Mockito.mock(StringRedisTemplate.class);
 //        Mockito.when(template.getConnectionFactory()).thenReturn(Mockito.mock(JedisConnectionFactory.class));
-        articleIdCounter = new RedisAtomicLong(KeyUtils.globalAid(), template.getConnectionFactory());
+        articleIdCounter = new RedisAtomicLong(KeyUtils.globalArticleId(), template.getConnectionFactory());
+        authorIdCounter = new RedisAtomicLong(KeyUtils.globalAuthorId(), template.getConnectionFactory());
     }
 
     @After
@@ -57,7 +55,7 @@ public class ArticleServiceTest {
         dummy.setTeaserText("dummy description");
         dummy.setHeadline("dummy headline");
         dummy.setMainText("dummy text");
-        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
+//        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
         final ArticleService toTest = new ArticleService(template);
         Article result = toTest.createArticle(dummy);
@@ -75,7 +73,7 @@ public class ArticleServiceTest {
         dummy.setTeaserText("dummy description");
         dummy.setHeadline("dummy headline");
         dummy.setMainText("dummy text");
-        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
+//        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
         dummy.getAuthors().add(new Author("f1", "l1"));
         dummy.getAuthors().add(new Author("f2", "l2"));

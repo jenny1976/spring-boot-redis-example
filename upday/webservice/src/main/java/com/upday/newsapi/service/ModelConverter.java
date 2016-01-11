@@ -16,8 +16,7 @@ public final class ModelConverter {
 
     protected static Article convertToNewArticle(final CreateArticle article) {
         final Article newArticle = new Article( null, article.getHeadline(),
-                                            article.getTeaserText(), article.getMainText(),
-                                            article.getPublishedOn());
+                                            article.getTeaserText(), article.getMainText());
 
         if(!CollectionUtils.isEmpty(article.getAuthors())) {
             newArticle.setAuthors(article.getAuthors());
@@ -30,13 +29,8 @@ public final class ModelConverter {
     }
 
     protected static Article convertToArticle(final UpdateArticle article, final String id) {
-        final Article toUpdate = new Article();
-
-        toUpdate.setId(id);
-        toUpdate.setTeaserText(article.getTeaserText());
-        toUpdate.setHeadline(article.getHeadline());
-        toUpdate.setMainText(article.getMainText());
-        toUpdate.setPublishedOn(article.getPublishedOn());
+        final Article toUpdate = new Article(id, article.getHeadline(), article.getTeaserText(),
+                article.getMainText(), article.getPublishedOn());
 
         if(!CollectionUtils.isEmpty(article.getAuthors())) {
             toUpdate.setAuthors(article.getAuthors());

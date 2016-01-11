@@ -148,7 +148,7 @@ public class ArticlesController {
      * @return  an {@link Article} List
      */
     @RequestMapping( value = "/author/{authorId}", method = GET )
-    public @ResponseBody List<Article> getArticlesByAuthor(final @PathVariable("authorId") Long authorId) {
+    public @ResponseBody List<Article> getArticlesByAuthor(final @PathVariable("authorId") String authorId) {
 
         return articleService.findByAuthorId(authorId);
     }

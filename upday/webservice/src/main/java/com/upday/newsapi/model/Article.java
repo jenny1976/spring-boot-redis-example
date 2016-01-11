@@ -24,7 +24,7 @@ public class Article implements Serializable {
     private String teaserText;
     private String mainText;
 
-    private Date publishedOn;
+    private String publishedOn;
 
     private List<Author> authors = new ArrayList<>();
     private List<Keyword> keywords = new ArrayList<>();
@@ -32,7 +32,15 @@ public class Article implements Serializable {
     public Article() {
     }
 
-    public Article(String id, String headline, String teaserText, String mainText, Date publishedOn) {
+    public Article(String id, String headline, String teaserText, String mainText) {
+        this.id = id;
+        this.headline = headline;
+        this.teaserText = teaserText;
+        this.mainText = mainText;
+        this.publishedOn = String.valueOf(System.currentTimeMillis());
+    }
+
+    public Article(String id, String headline, String teaserText, String mainText, String publishedOn) {
         this.id = id;
         this.headline = headline;
         this.teaserText = teaserText;
@@ -60,7 +68,7 @@ public class Article implements Serializable {
         return mainText;
     }
 
-    public Date getPublishedOn() {
+    public String getPublishedOn() {
         return publishedOn;
     }
 
@@ -88,12 +96,13 @@ public class Article implements Serializable {
         this.mainText = mainText;
     }
 
-    public void setPublishedOn(Date publishedOn) {
+    public void setPublishedOn(String publishedOn) {
         this.publishedOn = publishedOn;
     }
 
-    public LocalDate publishedOnAsLocalDate() {
-        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
+    public String publishedOnFormatted() {
+        return "null";
+//        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
     }
 
     public void setTeaserText(String teaserText) {

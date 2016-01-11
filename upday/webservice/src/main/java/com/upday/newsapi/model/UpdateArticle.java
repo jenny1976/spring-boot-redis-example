@@ -30,7 +30,7 @@ public class UpdateArticle implements Serializable {
     private String mainText;
 
     @NotNull
-    private Date publishedOn;
+    private String publishedOn;
 
     private List<Author> authors = new ArrayList<>();
     private List<Keyword> keywords = new ArrayList<>();
@@ -39,7 +39,7 @@ public class UpdateArticle implements Serializable {
         // default
     }
 
-    public UpdateArticle(String headline, String teaserText, String mainText, Date publishedOn) {
+    public UpdateArticle(String headline, String teaserText, String mainText, String publishedOn) {
         this.headline = headline;
         this.teaserText = teaserText;
         this.mainText = mainText;
@@ -70,15 +70,15 @@ public class UpdateArticle implements Serializable {
         this.mainText = mainText;
     }
 
-    public LocalDate publishedOnAsLocalDate() {
-        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
-    }
+//    public LocalDate publishedOnAsLocalDate() {
+//        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
+//    }
 
-    public Date getPublishedOn() {
+    public String getPublishedOn() {
         return publishedOn;
     }
 
-    public void setPublishedOn(Date publishedOn) {
+    public void setPublishedOn(String publishedOn) {
         this.publishedOn = publishedOn;
     }
 

@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.hash.DecoratingStringHashMapper;
@@ -35,6 +36,8 @@ public class ArticleService {
     private final ValueOperations<String, String> valueOps;
 
     private final RedisAtomicLong articleIdCounter;
+    private final RedisAtomicLong authorIdCounter;
+    private final RedisAtomicLong keywordIdCounter;
 
     private final HashMapper<Article, String, String> postMapper = new DecoratingStringHashMapper<Article>(
 			new JacksonHashMapper<Article>(Article.class));
@@ -48,7 +51,9 @@ public class ArticleService {
     public ArticleService(StringRedisTemplate template) {
         this.redisTemplate = template;
         this.valueOps = template.opsForValue();
-        this.articleIdCounter = new RedisAtomicLong(KeyUtils.globalAid(), template.getConnectionFactory());
+        this.articleIdCounter = new RedisAtomicLong(KeyUtils.globalArticleId(), template.getConnectionFactory());
+        this.authorIdCounter = new RedisAtomicLong(KeyUtils.globalAuthorId(), template.getConnectionFactory());
+        this.keywordIdCounter = new RedisAtomicLong(KeyUtils.globalKeywordId(), template.getConnectionFactory());
 
 //        articlesQueue = new DefaultRedisList<>("articles", redisTemplate);
 //        authorsQueue = new DefaultRedisList<>("authors", redisTemplate);
@@ -99,16 +104,19 @@ public class ArticleService {
 
     public Article findOne(final String articleId) {
         LOGGER.info("----------------- find article with id: " + articleId);
-//        redisTemplate.opsForValue().multiGet(null)
-        return new Article();
+        BoundHashOperations<String, String, String> articleOps = redisTemplate.boundHashOps(KeyUtils.articleId(articleId));
+        Article result = new Article(articleId, articleOps.get("headline"), articleOps.get("subheadline"),
+                articleOps.get("content"), articleOps.get("publishedOn"));
+        
+        return result;
     }
 
-    public List<Article> findByAuthorId(final Long authorId) {
+    public List<Article> findByAuthorId(final String authorId) {
         LOGGER.info("----------------- find articles by authorId: " + authorId);
 
 //        final Author author = authorRepository.findOne(authorId);
 //        return author.getArticles();
-        return null;
+        return Collections.EMPTY_LIST;
 
     }
 
@@ -128,12 +136,13 @@ public class ArticleService {
 
     private void saveKeywords(final List<Keyword> keywords, final String articleId) {
 
-        redisTemplate.delete("article:"+articleId+":keyword:");
+        //TODO
+//        redisTemplate.delete("article:"+articleId+":keyword:");
 
         if(!CollectionUtils.isEmpty(keywords)) {
             keywords.stream().map((keyword) -> {
-                String id = UUID.randomUUID().toString();
-                redisTemplate.opsForValue().set("article:"+articleId+":keyword:"+id, keyword.getName());
+                String kwId = String.valueOf(keywordIdCounter.incrementAndGet());
+                redisTemplate.opsForValue().set(KeyUtils.keyword(articleId, kwId), keyword.getName());
                 return keyword;
             }).forEach((keyword) -> {
 //                this.keywordsQueue.addFirst(keyword);
@@ -143,13 +152,15 @@ public class ArticleService {
 
     private void saveAuthors(final List<Author> authors, final String articleId) {
 
-        redisTemplate.delete("article:"+articleId+":author:");
+        if(isArticleValid(articleId)) {
+//            redisTemplate.delete("article:"+articleId+":author:");
+        }
 
         if(!CollectionUtils.isEmpty(authors)) {
             authors.stream().map((author) -> {
-                String id = UUID.randomUUID().toString();
-                redisTemplate.opsForValue().set("article:"+articleId+":author:"+id+":firstname", author.getFirstname());
-                redisTemplate.opsForValue().set("article:"+articleId+":author:"+id+":lastname", author.getLastname());
+                String authorId = String.valueOf(authorIdCounter.incrementAndGet());
+                redisTemplate.opsForValue().set(KeyUtils.firstname(articleId, authorId), author.getFirstname());
+                redisTemplate.opsForValue().set(KeyUtils.lastname(articleId, authorId), author.getLastname());
                 return author;
             }).forEach((author) -> {
 //                this.authorsQueue.add(author);
@@ -158,10 +169,13 @@ public class ArticleService {
     }
 
     private void saveArticle(final Article article, final String articleId) {
-        redisTemplate.opsForValue().set("article:"+articleId+":headline", article.getHeadline());
-        redisTemplate.opsForValue().set("article:"+articleId+":subheadline", article.getTeaserText());
-        redisTemplate.opsForValue().set("article:"+articleId+":maintext", article.getMainText());
-        redisTemplate.opsForValue().set("article:"+articleId+":publishedon", article.getPublishedOn().toString());
+
+        BoundHashOperations<String, String, String> articleOps = redisTemplate.boundHashOps(KeyUtils.articleId(articleId));
+        articleOps.put("headline", article.getHeadline());
+        articleOps.put("subheadline", article.getTeaserText());
+        articleOps.put("content", article.getMainText());
+        articleOps.put("publishedOn", article.getPublishedOn());
+
     }
 
     public boolean isArticleValid(String id) {

@@ -1,15 +1,11 @@
 package com.upday.newsapi.model;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -30,9 +26,6 @@ public class CreateArticle implements Serializable {
     @NotBlank
     private String mainText;
 
-    @NotNull
-    private Date publishedOn;
-
     private List<Author> authors = new ArrayList<>();;
     private List<Keyword> keywords = new ArrayList<>();;
 
@@ -41,11 +34,10 @@ public class CreateArticle implements Serializable {
         // default
     }
 
-    public CreateArticle(String headline, String teaserText, String mainText, Date publishedOn) {
+    public CreateArticle(String headline, String teaserText, String mainText) {
         this.headline = headline;
         this.teaserText = teaserText;
         this.mainText = mainText;
-        this.publishedOn = publishedOn;
     }
 
     public String getHeadline() {
@@ -71,18 +63,10 @@ public class CreateArticle implements Serializable {
     public void setMainText(String mainText) {
         this.mainText = mainText;
     }
-
-    public LocalDate publishedOnAsLocalDate() {
-        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
-    }
-
-    public Date getPublishedOn() {
-        return publishedOn;
-    }
-
-    public void setPublishedOn(Date publishedOn) {
-        this.publishedOn = publishedOn;
-    }
+//
+//    public LocalDate publishedOnAsLocalDate() {
+//        return LocalDateTime.ofInstant(this.publishedOn.toInstant(), ZoneId.systemDefault()).toLocalDate();
+//    }
 
     public List<Author> getAuthors() {
         return authors;
@@ -103,7 +87,7 @@ public class CreateArticle implements Serializable {
     @Override
     public String toString() {
         return "CreateArticle{" + "headline=" + headline + ", teaserText=" + teaserText
-                + ", mainText=" + mainText + ", publishedOn=" + publishedOn + ", authors="
+                + ", mainText=" + mainText + ", authors="
                 + authors + ", keywords=" + keywords + '}';
     }
 
@@ -113,7 +97,6 @@ public class CreateArticle implements Serializable {
         hash = 47 * hash + Objects.hashCode(this.headline);
         hash = 47 * hash + Objects.hashCode(this.teaserText);
         hash = 47 * hash + Objects.hashCode(this.mainText);
-        hash = 47 * hash + Objects.hashCode(this.publishedOn);
         hash = 47 * hash + Objects.hashCode(this.authors);
         hash = 47 * hash + Objects.hashCode(this.keywords);
         return hash;
@@ -135,9 +118,6 @@ public class CreateArticle implements Serializable {
             return false;
         }
         if (!Objects.equals(this.mainText, other.mainText)) {
-            return false;
-        }
-        if (!Objects.equals(this.publishedOn, other.publishedOn)) {
             return false;
         }
         if (!Objects.equals(this.authors, other.authors)) {
