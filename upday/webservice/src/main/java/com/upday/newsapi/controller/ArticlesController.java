@@ -144,13 +144,13 @@ public class ArticlesController {
     /**
      * Get a List of {@link Article}s by a given authorId.
      *
-     * @param   authorId    an author.id
+     * @param   author     an author.name, can be first- or lastname
      * @return  an {@link Article} List
      */
-    @RequestMapping( value = "/author/{authorId}", method = GET )
-    public @ResponseBody List<Article> getArticlesByAuthor(final @PathVariable("authorId") String authorId) {
+    @RequestMapping( value = "/author/{author}", method = GET )
+    public @ResponseBody List<Article> getArticlesByAuthor(final @PathVariable("author") String author) {
 
-        return articleService.findByAuthorId(authorId);
+        return articleService.findByAuthorName(author);
     }
 
     /**
