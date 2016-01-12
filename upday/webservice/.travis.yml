@@ -1,6 +1,0 @@
-language: JAVA
-# whitelist
-branches:
-  only:
-    - master
-    - redis-version
