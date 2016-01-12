@@ -13,6 +13,12 @@ abstract class KeyUtils {
     static String articleId(String articleId) {
         return AID + articleId;
     }
+    static String keywordId(String keywordId) {
+        return KID + keywordId;
+    }
+    static String authorId(String authorId) {
+        return AuID + authorId;
+    }
 
     static String keywords(String articleId) {
         return AID + articleId + ":keywords";
@@ -26,13 +32,13 @@ abstract class KeyUtils {
         return AID + articleId + ":keyword:"+kid;
     }
 
-    static String firstname(String articleId, String auId) {
-        return AID + articleId + ":author:"+auId+":firstname";
-    }
-
-    static String lastname(String articleId, String auId) {
-        return AID + articleId + ":author:"+auId+":lastname";
-    }
+//    static String firstname(String articleId, String auId) {
+//        return AID + articleId + ":author:"+auId+":firstname";
+//    }
+//
+//    static String lastname(String articleId, String auId) {
+//        return AID + articleId + ":author:"+auId+":lastname";
+//    }
 
     static String globalArticleId() {
         return "global:aid";

@@ -29,7 +29,7 @@ public class UpdateArticle implements Serializable {
     @NotBlank
     private String mainText;
 
-    @NotNull
+    
     private String publishedOn;
 
     private List<Author> authors = new ArrayList<>();

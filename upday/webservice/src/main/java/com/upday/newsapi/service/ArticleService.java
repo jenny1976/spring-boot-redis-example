@@ -20,6 +20,10 @@ import org.springframework.data.redis.hash.DecoratingStringHashMapper;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.JacksonHashMapper;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
+import org.springframework.data.redis.support.collections.DefaultRedisList;
+import org.springframework.data.redis.support.collections.DefaultRedisMap;
+import org.springframework.data.redis.support.collections.RedisList;
+import org.springframework.data.redis.support.collections.RedisMap;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -39,7 +43,7 @@ public class ArticleService {
     private final RedisAtomicLong authorIdCounter;
     private final RedisAtomicLong keywordIdCounter;
 
-    private final HashMapper<Article, String, String> postMapper = new DecoratingStringHashMapper<Article>(
+    private final HashMapper<Article, String, String> articleMapper = new DecoratingStringHashMapper<Article>(
 			new JacksonHashMapper<Article>(Article.class));
 
 //    private final RedisList<Article> articlesQueue;
@@ -94,11 +98,9 @@ public class ArticleService {
 
     public boolean deleteArticle(final String articleId) {
         LOGGER.info("----------------- delete article with id: " + articleId);
-//        if(articleRepository.exists(articleId)) {
-//            articleRepository.delete(articleId);
-//        } else {
-//            return false;
-//        }
+        deleteKeywords(articleId);
+        deleteAuthors(articleId);
+        deleteArticleById(articleId);
         return true;
     }
 
@@ -107,12 +109,23 @@ public class ArticleService {
         BoundHashOperations<String, String, String> articleOps = redisTemplate.boundHashOps(KeyUtils.articleId(articleId));
         Article result = new Article(articleId, articleOps.get("headline"), articleOps.get("subheadline"),
                 articleOps.get("content"), articleOps.get("publishedOn"));
-        
+
+        RedisList<String> keywordIds = keywords(articleId);
+        for (String kId : keywordIds) {
+            result.getKeywords().add(new Keyword(valueOps.get(KeyUtils.keywordId(kId))));
+        }
+
+        RedisList<String> authorIds = authors(articleId);
+        for (String authorId : authorIds) {
+            BoundHashOperations<String, String, String> authOps =redisTemplate.boundHashOps(KeyUtils.authorId(authorId));
+            result.getAuthors().add(new Author(authOps.get("firstname"), authOps.get("lastname")));
+        }
+
         return result;
     }
 
-    public List<Article> findByAuthorId(final String authorId) {
-        LOGGER.info("----------------- find articles by authorId: " + authorId);
+    public List<Article> findByAuthorName(final String name) {
+        LOGGER.info("----------------- find articles by author: " + name);
 
 //        final Author author = authorRepository.findOne(authorId);
 //        return author.getArticles();
@@ -136,36 +149,32 @@ public class ArticleService {
 
     private void saveKeywords(final List<Keyword> keywords, final String articleId) {
 
-        //TODO
-//        redisTemplate.delete("article:"+articleId+":keyword:");
+        deleteKeywords(articleId);
 
-        if(!CollectionUtils.isEmpty(keywords)) {
-            keywords.stream().map((keyword) -> {
-                String kwId = String.valueOf(keywordIdCounter.incrementAndGet());
-                redisTemplate.opsForValue().set(KeyUtils.keyword(articleId, kwId), keyword.getName());
-                return keyword;
-            }).forEach((keyword) -> {
-//                this.keywordsQueue.addFirst(keyword);
-            });
-        }
+        keywords.stream().map((keyword) -> {
+            String keywordId = String.valueOf(keywordIdCounter.incrementAndGet());
+            redisTemplate.opsForValue().set(KeyUtils.keywordId(keywordId), keyword.getName());
+            return keywordId;
+        }).forEach((keywordId) -> {
+            keywords(articleId).add(keywordId);
+        });
+
     }
 
     private void saveAuthors(final List<Author> authors, final String articleId) {
 
-        if(isArticleValid(articleId)) {
-//            redisTemplate.delete("article:"+articleId+":author:");
-        }
+        deleteAuthors(articleId);
 
-        if(!CollectionUtils.isEmpty(authors)) {
-            authors.stream().map((author) -> {
-                String authorId = String.valueOf(authorIdCounter.incrementAndGet());
-                redisTemplate.opsForValue().set(KeyUtils.firstname(articleId, authorId), author.getFirstname());
-                redisTemplate.opsForValue().set(KeyUtils.lastname(articleId, authorId), author.getLastname());
-                return author;
-            }).forEach((author) -> {
-//                this.authorsQueue.add(author);
-            });
-        }
+        authors.stream().map((author) -> {
+            String authorId = String.valueOf(authorIdCounter.incrementAndGet());
+            BoundHashOperations<String, String, String> authorOps = redisTemplate.boundHashOps(KeyUtils.authorId(authorId));
+            authorOps.put("firstname", author.getFirstname());
+            authorOps.put("lastname", author.getLastname());
+            return authorId;
+        }).forEach((authorId) -> {
+            authors(articleId).add(authorId);
+        });
+
     }
 
     private void saveArticle(final Article article, final String articleId) {
@@ -180,5 +189,31 @@ public class ArticleService {
 
     public boolean isArticleValid(String id) {
         return redisTemplate.hasKey(KeyUtils.articleId(id));
+    }
+
+    private RedisList<String> keywords(String articleId) {
+        return new DefaultRedisList<String>(KeyUtils.keywords(articleId), redisTemplate);
+    }
+
+    private RedisList<String> authors(String articleId) {
+        return new DefaultRedisList<String>(KeyUtils.authors(articleId), redisTemplate);
+    }
+
+    private void deleteKeywords(String articleId) {
+        for (String kId : keywords(articleId)) {
+            valueOps.getOperations().delete(KeyUtils.keywordId(kId));
+        }
+        keywords(articleId).clear();
+    }
+
+    private void deleteAuthors(String articleId) {
+        for (String authorId : authors(articleId)) {
+            valueOps.getOperations().delete(KeyUtils.authorId(authorId));
+        }
+        authors(articleId).clear();
+    }
+
+    private void deleteArticleById(String articleId) {
+        valueOps.getOperations().delete(KeyUtils.articleId(articleId));
     }
 }
