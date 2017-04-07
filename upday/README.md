@@ -23,7 +23,7 @@ There is also a postman project available for a quick-start [here](https://githu
 ### Getting started
 if you want to run the application, change into the webservice-folder where you can find the pom.xml and execute the spring-boot 
 ```bash
-console:/some/path/upday/webservice$ mvn sprint-boot:run
+console:/some/path/upday/webservice$ mvn spring-boot:run
 ```
 or install via maven (`mvn clean install`) and start the *.jar that resides in the target-folder
 ```bash 
