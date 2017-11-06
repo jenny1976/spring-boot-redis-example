@@ -8,15 +8,16 @@ import com.upday.newsapi.service.ArticleService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -32,24 +33,25 @@ public class ArticlesControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @InjectMocks
+    private ArticlesController articlesController;
+
     private MockMvc mvc;
+
+    @Mock
     private ArticleService articleService;
 
     @Before
     public void setUp() {
-        articleService = Mockito.mock(ArticleService.class);
-        mvc = MockMvcBuilders.standaloneSetup(new ArticlesController(articleService)).build();
+        MockitoAnnotations.initMocks(this);
+        
+        mvc = MockMvcBuilders.standaloneSetup(articlesController).build();
     }
-
-    @After
-    public void tearDown() {
-    }
-
 
     @Test
     public void testCreateArticle() throws Exception {
         System.out.println("----- createArticle");
-        CreateArticle article = new CreateArticle(null, "subheadline", "text");
+        CreateArticle article = new CreateArticle(null, "subheadline", "text", null, null);
 
         Article dummy2 = new Article("1", "headline", "subheadline", "text",
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
@@ -117,14 +119,10 @@ public class ArticlesControllerTest {
     public void testUpdateArticle() throws Exception {
         System.out.println("----- updateArticle");
         UpdateArticle toUpdate = new UpdateArticle(null, "subheadline", "text",
-                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString(), null, null);
 
-        Article dummy = new Article();
-        dummy.setId("13");
-        dummy.setHeadline("headline");
-        dummy.setTeaserText("subheadline");
-        dummy.setMainText("text");
-        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
+        Article dummy = new Article("13", "headline", "subheadline", "text",
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
         when(articleService.updateArticle(toUpdate, "13")).thenReturn(dummy);
 

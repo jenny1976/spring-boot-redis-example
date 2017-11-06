@@ -9,7 +9,6 @@ import com.upday.newsapi.model.UpdateArticle;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +20,8 @@ import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.hash.JacksonHashMapper;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.data.redis.support.collections.DefaultRedisList;
-import org.springframework.data.redis.support.collections.DefaultRedisMap;
 import org.springframework.data.redis.support.collections.RedisList;
-import org.springframework.data.redis.support.collections.RedisMap;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author jschulz
@@ -50,8 +46,6 @@ public class ArticleService {
 //    private final RedisList<Author> authorsQueue;
 //    private final RedisList<Keyword> keywordsQueue;
 
-
-    @Autowired
     public ArticleService(StringRedisTemplate template) {
         this.redisTemplate = template;
         this.valueOps = template.opsForValue();
@@ -107,6 +101,9 @@ public class ArticleService {
     public Article findOne(final String articleId) {
         LOGGER.info("----------------- find article with id: " + articleId);
         BoundHashOperations<String, String, String> articleOps = redisTemplate.boundHashOps(KeyUtils.articleId(articleId));
+        if (articleOps.size() < 1) {
+            return null;
+        }
         Article result = new Article(articleId, articleOps.get("headline"), articleOps.get("subheadline"),
                 articleOps.get("content"), articleOps.get("publishedOn"));
 

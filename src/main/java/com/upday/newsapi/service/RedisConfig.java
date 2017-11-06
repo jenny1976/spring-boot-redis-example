@@ -12,11 +12,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 @Configuration
 public class RedisConfig {
 
-
     @Bean(name="redisTemplate")
     public StringRedisTemplate redisTemplate() throws Exception {
         StringRedisTemplate redisTemplate = new StringRedisTemplate();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setEnableTransactionSupport(true);
         return redisTemplate;
     }
 

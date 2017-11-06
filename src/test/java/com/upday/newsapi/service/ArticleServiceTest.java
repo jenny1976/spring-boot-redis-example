@@ -4,10 +4,6 @@ import com.upday.newsapi.model.Article;
 import com.upday.newsapi.model.Author;
 import com.upday.newsapi.model.CreateArticle;
 import com.upday.newsapi.model.Keyword;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-import java.util.Date;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
@@ -51,10 +47,7 @@ public class ArticleServiceTest {
 
     @Test
     public void testCreateArticle() {
-        CreateArticle dummy = new CreateArticle();
-        dummy.setTeaserText("dummy description");
-        dummy.setHeadline("dummy headline");
-        dummy.setMainText("dummy text");
+        CreateArticle dummy = new CreateArticle("dummy headline", "dummy description", "dummy text", null, null);
 //        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
         final ArticleService toTest = new ArticleService(template);
@@ -69,10 +62,7 @@ public class ArticleServiceTest {
 
     @Test
     public void testCreateArticleWithAK() {
-        CreateArticle dummy = new CreateArticle();
-        dummy.setTeaserText("dummy description");
-        dummy.setHeadline("dummy headline");
-        dummy.setMainText("dummy text");
+        CreateArticle dummy = new CreateArticle("dummy headline", "dummy description", "dummy text", null, null);
 //        dummy.setPublishedOn(Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)));
 
         dummy.getAuthors().add(new Author("f1", "l1"));

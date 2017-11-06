@@ -2,32 +2,32 @@ package com.upday.newsapi.controller;
 
 import com.upday.newsapi.model.CreateArticle;
 import com.upday.newsapi.model.Article;
+import com.upday.newsapi.model.Keyword;
 import com.upday.newsapi.model.UpdateArticle;
 import com.upday.newsapi.service.ArticleService;
 
 import java.time.LocalDate;
 import java.util.List;
+import javax.inject.Inject;
 import javax.validation.Valid;
-import org.apache.log4j.Logger;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 
 /**
  * Handles Requests for the News-Article Service.
@@ -36,21 +36,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
  */
 @RestController
 @RequestMapping(
-        value = "/articles",
+        path = "/articles",
         produces = { "application/json" },
         consumes = { "application/json" }
 )
+@Slf4j
 public class ArticlesController {
 
-    private static final Logger LOGGER = Logger.getLogger(ArticlesController.class);
-
-    private final ArticleService articleService;
-
-    @Autowired
-    public ArticlesController(final ArticleService articleService) {
-        this.articleService = articleService;
-    }
-
+    @Inject
+    private ArticleService articleService;
 
     /**
      * Create a new Article, and if needed also new Authors and Keywords from
@@ -60,9 +54,10 @@ public class ArticlesController {
      * @param   validationResult    result from bean-validation
      * @return  new created {@link Article} and HttpStatusCode
      */
-    @RequestMapping( value = "/", method = PUT )
-    public ResponseEntity<Article> createArticle(final @RequestBody @Valid CreateArticle newArticle,
-            final BindingResult validationResult ) {
+    @PutMapping( path = "/" )
+    public ResponseEntity<Article> createArticle(
+            @RequestBody @Valid CreateArticle newArticle,
+            BindingResult validationResult ) {
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'newArticle'.");
         }
@@ -88,9 +83,11 @@ public class ArticlesController {
      * @param validationResult  result from bean-validation
      * @return the updated {@link Article}
      */
-    @RequestMapping( value = "/{articleId}", method = POST )
-    public ResponseEntity<Article> updateArticle(final @PathVariable("articleId") String articleId,
-            @RequestBody @Valid UpdateArticle updateArticle, final BindingResult validationResult) {
+    @PostMapping( path = "/{articleId}" )
+    public ResponseEntity<Article> updateArticle(
+            @PathVariable(name = "articleId") String articleId,
+            @RequestBody @Valid UpdateArticle updateArticle,
+            BindingResult validationResult) {
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'updateArticle'.");
         }
@@ -112,8 +109,8 @@ public class ArticlesController {
      *
      * @param articleId     article.id
      */
-    @RequestMapping( value = "/{articleId}", method = DELETE )
-    public void deleteArticle(final @PathVariable("articleId") String articleId) {
+    @DeleteMapping( path = "/{articleId}" )
+    public void deleteArticle( @PathVariable(name = "articleId") String articleId ) {
 
         boolean success = articleService.deleteArticle(articleId);
         if(!success) {
@@ -127,8 +124,8 @@ public class ArticlesController {
      * @param   articleId     article.id
      * @return  the {@link Article}
      */
-    @RequestMapping( value = "/{articleId}", method = GET )
-    public ResponseEntity<Article> getArticle(final @PathVariable("articleId") String articleId) {
+    @GetMapping( path = "/{articleId}" )
+    public ResponseEntity<Article> getArticle( @PathVariable(name = "articleId") String articleId ) {
 
         final Article dbArticle = articleService.findOne(articleId);
 
@@ -147,8 +144,8 @@ public class ArticlesController {
      * @param   author     an author.name, can be first- or lastname
      * @return  an {@link Article} List
      */
-    @RequestMapping( value = "/author/{author}", method = GET )
-    public @ResponseBody List<Article> getArticlesByAuthor(final @PathVariable("author") String author) {
+    @GetMapping( path = "/author/{author}" )
+    public @ResponseBody List<Article> getArticlesByAuthor( @PathVariable(name = "author") String author ) {
 
         return articleService.findByAuthorName(author);
     }
@@ -162,10 +159,10 @@ public class ArticlesController {
      *
      * @return  an {@link Article} List
      */
-    @RequestMapping( value = "/date/{from}/{to}", method = GET )
+    @GetMapping( path = "/date/{from}/{to}" )
     public @ResponseBody List<Article> getArticlesByDateRange(
-            final @PathVariable("from") @DateTimeFormat(iso=ISO.DATE) LocalDate fromDate,
-            final @PathVariable("to") @DateTimeFormat(iso=ISO.DATE) LocalDate toDate) {
+            @PathVariable(name = "from") @DateTimeFormat(iso=ISO.DATE) LocalDate fromDate,
+            @PathVariable(name = "to") @DateTimeFormat(iso=ISO.DATE) LocalDate toDate) {
 
         List<Article> result;
 
@@ -184,8 +181,8 @@ public class ArticlesController {
      * @param searchKeyword     the keyword.name
      * @return  an {@link Article} List
      */
-    @RequestMapping( value = "/search/{searchKeyword}", method = GET )
-    public @ResponseBody List<Article> getArticlesByKeyword(final @PathVariable("searchKeyword") String searchKeyword) {
+    @GetMapping( path = "/search/{searchKeyword}" )
+    public @ResponseBody List<Article> getArticlesByKeyword( @PathVariable(name = "searchKeyword") String searchKeyword ) {
 
         return articleService.findByKeywordName(searchKeyword);
     }
