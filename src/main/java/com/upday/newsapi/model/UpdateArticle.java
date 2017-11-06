@@ -2,25 +2,23 @@ package com.upday.newsapi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NonNull;
-
 
 /**
  * @author jschulz
  */
 @Data
-@AllArgsConstructor
 public class UpdateArticle {
 
-    @NonNull
-    private String headline;
-    @NonNull
-    private String teaserText;
-    @NonNull
-    private String mainText;
-    private String publishedOn;
+    @NotNull
+    private final String headline;
+    @NotNull
+    private final String teaserText;
+    @NotNull
+    private final String mainText;
+    @NotNull
+    private final String publishedOn;
 
     private List<Author> authors = new ArrayList<>();
     private List<Keyword> keywords = new ArrayList<>();

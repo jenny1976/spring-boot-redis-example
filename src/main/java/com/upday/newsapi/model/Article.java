@@ -2,10 +2,8 @@ package com.upday.newsapi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * a REST article representation.
@@ -13,8 +11,6 @@ import lombok.RequiredArgsConstructor;
  * @author jschulz
  */
 @Data
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class Article {
 
     @NonNull

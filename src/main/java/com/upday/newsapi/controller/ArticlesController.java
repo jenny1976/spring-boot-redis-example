@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,7 +55,7 @@ public class ArticlesController {
      */
     @PutMapping( path = "/" )
     public ResponseEntity<Article> createArticle(
-            @RequestBody @Valid CreateArticle newArticle,
+            @RequestBody(required = true) @Valid CreateArticle newArticle,
             BindingResult validationResult ) {
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'newArticle'.");
@@ -84,10 +83,9 @@ public class ArticlesController {
      * @return the updated {@link Article}
      */
     @PostMapping( path = "/{articleId}" )
-    public ResponseEntity<Article> updateArticle(
-            @PathVariable(name = "articleId") String articleId,
-            @RequestBody @Valid UpdateArticle updateArticle,
-            BindingResult validationResult) {
+    public ResponseEntity<Article> updateArticle( @PathVariable(name = "articleId") String articleId,
+            @RequestBody @Valid UpdateArticle updateArticle, BindingResult validationResult) {
+        
         if(validationResult.hasErrors()) {
             throw new IllegalArgumentException("There are invalid arguments in 'updateArticle'.");
         }

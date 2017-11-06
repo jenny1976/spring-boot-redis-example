@@ -11,10 +11,8 @@ import java.util.Date;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -25,21 +23,11 @@ public class ModelConverterTest {
 
     private Article dummyArticle;
 
-    public ModelConverterTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
     public void setUp() throws ParseException {
 
-        dummyArticle =  new Article("1", "headline", "dummy teaser text", "dummy maintext", Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
+        dummyArticle =  new Article("1", "headline", "dummy teaser text", "dummy maintext",
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
         Author rsAuthor = new Author( "firstname1", "lastname1");
         Author rsAuthor2 = new Author("firstname2", "lastname2");
@@ -60,7 +48,7 @@ public class ModelConverterTest {
     @Test
     public void testConvertToArticle() {
         UpdateArticle updateArticle = new UpdateArticle("headline", "dummy teaser text", "dummy maintext",
-                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString(), null, null);
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
         updateArticle.getAuthors().add(new Author("firstname1", "lastname1"));
         updateArticle.getAuthors().add(new Author("firstname2", "lastname2"));
         updateArticle.getKeywords().add(new Keyword("keyword1"));
@@ -73,7 +61,7 @@ public class ModelConverterTest {
 
     @Test
     public void testConvertToNewArticle() {
-        CreateArticle article = new CreateArticle("headline", "dummy teaser text", "dummy maintext", null, null);
+        CreateArticle article = new CreateArticle("headline", "dummy teaser text", "dummy maintext");
         article.getAuthors().add(new Author("firstname1", "lastname1"));
         article.getAuthors().add(new Author("firstname2", "lastname2"));
         article.getKeywords().add(new Keyword("keyword1"));

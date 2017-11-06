@@ -44,23 +44,21 @@ public class ArticlesControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        
+
         mvc = MockMvcBuilders.standaloneSetup(articlesController).build();
     }
 
     @Test
     public void testCreateArticle() throws Exception {
         System.out.println("----- createArticle");
-        CreateArticle article = new CreateArticle(null, "subheadline", "text", null, null);
+        CreateArticle article = new CreateArticle(null, "subheadline", "text");
 
         Article dummy2 = new Article("1", "headline", "subheadline", "text",
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
-        when(articleService.createArticle(article)).thenReturn(dummy2);
-
         // empty request
         mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().string(""));
 
         // ivalid request content
@@ -75,7 +73,9 @@ public class ArticlesControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'newArticle'."));
 
         // valid request
-        article.setHeadline("headline");
+        article = new CreateArticle("headline", "subheadline", "text");
+        when(articleService.createArticle(article)).thenReturn(dummy2);
+
         mvc.perform(MockMvcRequestBuilders.put("/articles/").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(article))
                 )
@@ -118,13 +118,11 @@ public class ArticlesControllerTest {
     @Test
     public void testUpdateArticle() throws Exception {
         System.out.println("----- updateArticle");
-        UpdateArticle toUpdate = new UpdateArticle(null, "subheadline", "text",
-                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString(), null, null);
+        UpdateArticle toUpdateInvalid = new UpdateArticle(null, "subheadline", "text",
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
 
         Article dummy = new Article("13", "headline", "subheadline", "text",
                 Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
-
-        when(articleService.updateArticle(toUpdate, "13")).thenReturn(dummy);
 
         // empty request
         mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON))
@@ -138,11 +136,13 @@ public class ArticlesControllerTest {
 
         // ivalid UpdateArticle content
         mvc.perform(MockMvcRequestBuilders.post("/articles/12").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(toUpdate)))
+                .content(objectMapper.writeValueAsString(toUpdateInvalid)))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("There are invalid arguments in 'updateArticle'."));
 
-        toUpdate.setHeadline("headline");
+        UpdateArticle toUpdate = new UpdateArticle("headline", "subheadline", "text",
+                Date.from(Instant.parse("2012-12-12T00:00:00.00Z").minus(1, ChronoUnit.HOURS)).toString());
+        when(articleService.updateArticle(toUpdate, "13")).thenReturn(dummy);
 
         // valid request
         mvc.perform(MockMvcRequestBuilders.post("/articles/11").contentType(MediaType.APPLICATION_JSON)
